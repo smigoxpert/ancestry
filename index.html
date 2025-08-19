@@ -2260,11 +2260,7 @@
                 const ancestralPath = familyPathData.ancestralPath;
                 const directRelationships = familyPathData.directRelationships;
                 const allRelatedPeople = familyPathData.allRelatedPeople;
-                
-                // Debug logging to verify ancestral path
-                console.log(`Highlighting relatives for: ${personId}`);
-                console.log('Ancestral path:', ancestralPath);
-                console.log('All related people:', allRelatedPeople);
+            
                 
                 // Highlight the selected person
                 const selectedCard = document.querySelector(`[data-person-id="${personId}"]`);
