@@ -3248,14 +3248,12 @@
             // Create ultra-high quality geometry for 4K resolution
             const geometry = new THREE.SphereGeometry(isMobile ? 0.4 : 0.5, isMobile ? 64 : 128, isMobile ? 64 : 128);
             
-            // Use existing color scheme from 2D view
             let baseColor;
             if (person.gender === 'M') {
-                baseColor = 0x4299e1; // Male blue (#4299e1)
+                baseColor = '#0000FF'; // Male blue (#4299e1)
             } else {
-                baseColor = 0xed64a6; // Female pink (#ed64a6)
+                baseColor = "#FFC0CB"; // Female pink (#ed64a6)
             }
-            
             const material = new THREE.MeshPhongMaterial({ 
                 color: baseColor,
                 transparent: true,
