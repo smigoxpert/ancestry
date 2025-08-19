@@ -2,8 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Igisekuru - Family Tree</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Family Tree - Vertical Layout</title>
+    
+    <!-- Three.js for 3D visualization -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
         * {
             margin: 0;
@@ -14,21 +18,183 @@
         body {
             font-family: 'Trebuchet MS', Arial, sans-serif;
             background: radial-gradient(circle at center, #1a365d 0%, #2d3748 50%, #1a202c 100%);
-            min-height: 100vh;
+            height: auto;
+            min-height: auto;
             color: #f7fafc;
             overflow-x: auto;
+            position: relative;
+        }
+
+        html {
+            height: auto;
+            min-height: auto;
+        }
+
+        /* Animated background elements */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(66, 153, 225, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(237, 100, 166, 0.1) 0%, transparent 50%);
+            z-index: -1000;
+            /* Disable animations on mobile for better performance */
+            animation: none;
+            /* Ensure this doesn't affect other elements */
+            isolation: isolate;
+        }
+
+        /* Floating family tree symbols */
+        .floating-symbols {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1000;
+            overflow: hidden;
+            /* Ensure these don't affect other elements */
+            isolation: isolate;
+        }
+
+        .floating-symbol {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.1;
+            /* Disable animations on mobile for better performance */
+            animation: none;
+        }
+
+        .floating-symbol:nth-child(1) { top: 10%; left: 10%; }
+        .floating-symbol:nth-child(2) { top: 20%; right: 15%; }
+        .floating-symbol:nth-child(3) { top: 60%; left: 20%; }
+        .floating-symbol:nth-child(4) { top: 70%; right: 25%; }
+        .floating-symbol:nth-child(5) { top: 40%; left: 60%; }
+        .floating-symbol:nth-child(6) { top: 80%; left: 70%; }
+        .floating-symbol:nth-child(7) { top: 30%; right: 40%; }
+        .floating-symbol:nth-child(8) { top: 90%; right: 60%; }
+
+        /* Enable animations only on desktop */
+        @media (min-width: 769px) {
+            body::before {
+                animation: backgroundShift 20s ease-in-out infinite;
+            }
+
+            .floating-symbol {
+                animation: float 15s ease-in-out infinite;
+            }
+
+            .floating-symbol:nth-child(1) { animation-delay: 0s; }
+            .floating-symbol:nth-child(2) { animation-delay: 2s; }
+            .floating-symbol:nth-child(3) { animation-delay: 4s; }
+            .floating-symbol:nth-child(4) { animation-delay: 6s; }
+            .floating-symbol:nth-child(5) { animation-delay: 8s; }
+            .floating-symbol:nth-child(6) { animation-delay: 10s; }
+            .floating-symbol:nth-child(7) { animation-delay: 12s; }
+            .floating-symbol:nth-child(8) { animation-delay: 14s; }
+        }
+
+        /* Background animations */
+        @keyframes backgroundShift {
+            0%, 100% { 
+                transform: scale(1) rotate(0deg);
+                opacity: 0.8;
+            }
+            50% { 
+                transform: scale(1.1) rotate(180deg);
+                opacity: 1;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.1;
+            }
+            25% { 
+                transform: translateY(-20px) rotate(90deg);
+                opacity: 0.2;
+            }
+            50% { 
+                transform: translateY(-40px) rotate(180deg);
+                opacity: 0.15;
+            }
+            75% { 
+                transform: translateY(-20px) rotate(270deg);
+                opacity: 0.2;
+            }
+        }
+
+        /* Connection lines animation */
+        .connection-lines-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1000;
+            /* Ensure these don't affect other elements */
+            isolation: isolate;
+        }
+
+        .connection-line-bg {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+            /* Disable animations on mobile for better performance */
+            animation: none;
+        }
+
+        .connection-line-bg:nth-child(1) { top: 25%; left: 0; width: 30%; }
+        .connection-line-bg:nth-child(2) { top: 45%; right: 0; width: 25%; }
+        .connection-line-bg:nth-child(3) { top: 65%; left: 20%; width: 35%; }
+        .connection-line-bg:nth-child(4) { top: 85%; right: 10%; width: 40%; }
+
+        /* Enable animations only on desktop */
+        @media (min-width: 769px) {
+            .connection-line-bg {
+                animation: connectionFlow 8s linear infinite;
+            }
+
+            .connection-line-bg:nth-child(1) { animation-delay: 0s; }
+            .connection-line-bg:nth-child(2) { animation-delay: 2s; }
+            .connection-line-bg:nth-child(3) { animation-delay: 4s; }
+            .connection-line-bg:nth-child(4) { animation-delay: 6s; }
+        }
+
+        @keyframes connectionFlow {
+            0% { 
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            50% { 
+                opacity: 0.5;
+            }
+            100% { 
+                transform: translateX(100%);
+                opacity: 0;
+            }
         }
 
         .main-container {
             width: 100vw;
-            min-height: 100vh;
+            height: auto;
+            min-height: auto;
             padding: 20px;
             position: relative;
+            overflow-x: hidden;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             position: sticky;
             top: 0;
             background: rgba(26, 54, 93, 0.9);
@@ -38,11 +204,35 @@
             z-index: 100;
         }
 
+        .header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            gap: 20px;
+            position: relative;
+            min-height: 60px;
+        }
+
         .header h1 {
             font-size: 2.5em;
             color: #ffd700;
             text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
             margin-bottom: 10px;
+            animation: neonGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes neonGlow {
+            from {
+                text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5),
+                             0 0 20px rgba(255, 215, 0, 0.5),
+                             0 0 30px rgba(255, 215, 0, 0.3);
+            }
+            to {
+                text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5),
+                             0 0 30px rgba(255, 215, 0, 0.8),
+                             0 0 40px rgba(255, 215, 0, 0.5);
+            }
         }
 
         .header p {
@@ -57,17 +247,35 @@
             align-items: center;
             width: 100%;
             min-width: fit-content;
-            padding: 40px 20px;
+            padding: 20px;
+            margin-top: 0;
+            position: relative; /* Required for relationship lines positioning */
         }
 
         .generation {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            margin: 40px 0;
+            margin: 20px 0;
             position: relative;
             width: 100%;
             gap: 30px;
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .generation.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .generation:nth-child(even) {
+            transform: translateX(50px);
+        }
+
+        .generation:nth-child(even).visible {
+            transform: translateX(0);
         }
 
         .generation::before {
@@ -93,32 +301,33 @@
             min-width: 200px;
             max-width: 280px;
             text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.6s ease forwards;
+            z-index: 10; /* Ensure cards are above relationship lines */
         }
 
-        .person-card:hover {
-            transform: translateY(-10px) scale(1.05);
-            box-shadow: 0 20px 50px rgba(255, 215, 0, 0.3);
-            border-color: #ffd700;
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+
+        .person-card:nth-child(1) { animation-delay: 0.1s; }
+        .person-card:nth-child(2) { animation-delay: 0.2s; }
+        .person-card:nth-child(3) { animation-delay: 0.3s; }
+        .person-card:nth-child(4) { animation-delay: 0.4s; }
+        .person-card:nth-child(5) { animation-delay: 0.5s; }
 
         .person-card.male {
             border-color: #4299e1;
             background: linear-gradient(145deg, #2c5282, #3182ce);
         }
 
-        .person-card.male:hover {
-            border-color: #63b3ed;
-            box-shadow: 0 20px 50px rgba(66, 153, 225, 0.4);
-        }
-
         .person-card.female {
             border-color: #ed64a6;
             background: linear-gradient(145deg, #b83280, #d53f8c);
-        }
-
-        .person-card.female:hover {
-            border-color: #f687b3;
-            box-shadow: 0 20px 50px rgba(237, 100, 166, 0.4);
         }
 
         .person-name {
@@ -151,8 +360,27 @@
             border-radius: 25px;
             font-weight: bold;
             font-size: 0.9em;
-            border: 1px solid #ffd700;
+            border: 2px solid #ffd700;
             white-space: nowrap;
+            transition: all 0.3s ease;
+            animation: generationNeon 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes generationNeon {
+            from {
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.3),
+                            0 0 25px rgba(255, 215, 0, 0.2);
+            }
+            to {
+                box-shadow: 0 0 25px rgba(255, 215, 0, 0.5),
+                            0 0 35px rgba(255, 215, 0, 0.3);
+            }
+        }
+
+        .generation-label:hover {
+            background: rgba(255, 215, 0, 0.2);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6),
+                        0 0 50px rgba(255, 215, 0, 0.4);
         }
 
         .connection-lines {
@@ -162,7 +390,8 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: -1;
+            z-index: 5;
+            overflow: hidden;
         }
 
         .connection-line {
@@ -173,43 +402,116 @@
 
         .controls {
             position: fixed;
-            top: 20px;
+            bottom: 20px;
             right: 20px;
+            top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
             background: rgba(45, 55, 72, 0.95);
             padding: 15px;
             border-radius: 15px;
-            border: 1px solid #718096;
+            border: 2px solid #718096;
+            transition: all 0.3s ease;
             z-index: 1000;
+            min-width: 180px;
+            /* Ensure proper layering */
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            /* Complete isolation from background animations */
+            will-change: auto;
+            backface-visibility: visible;
+            transform-style: flat;
+            isolation: auto;
+            contain: none;
+            /* Force hardware acceleration */
+            transform: none;
         }
 
         .controls button {
             background: linear-gradient(145deg, #4a5568, #2d3748);
             color: #f7fafc;
-            border: 1px solid #718096;
+            border: 2px solid #718096;
             padding: 10px 15px;
             border-radius: 8px;
             cursor: pointer;
             margin: 3px;
             transition: all 0.3s ease;
             font-size: 0.9em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .controls button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .controls button:hover::before {
+            left: 100%;
         }
 
         .controls button:hover {
             background: linear-gradient(145deg, #718096, #4a5568);
             border-color: #ffd700;
             transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4),
+                        0 0 40px rgba(255, 215, 0, 0.2);
         }
 
+        .controls button:active {
+            transform: translateY(0);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Base statistics positioning - always visible in 2D */
         .statistics {
             position: fixed;
             bottom: 20px;
             left: 20px;
-            background: rgba(45, 55, 72, 0.95);
             padding: 15px;
-            border-radius: 15px;
-            border: 1px solid #718096;
-            z-index: 1000;
             min-width: 200px;
+            font-size: 0.9em;
+            background: rgba(45, 55, 72, 0.95);
+            border-radius: 15px;
+            border: 2px solid #718096;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            /* Ensure proper layering */
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            /* Complete isolation from background animations */
+            will-change: auto;
+            backface-visibility: visible;
+            transform-style: flat;
+            isolation: auto;
+            contain: none;
+            /* Force hardware acceleration */
+            transform: none;
+        }
+
+        /* Mobile drawer behavior - only on mobile */
+        @media (max-width: 768px) {
+            .statistics {
+                bottom: -200px; /* Start off-screen on mobile */
+                top: auto;
+                left: 20px;
+                right: auto;
+                transform: none;
+                border-radius: 15px 15px 0 0;
+                border-bottom: none;
+                transition: bottom 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            }
+
+            .statistics.mobile-visible {
+                bottom: 0; /* Slide into view on mobile */
+            }
         }
 
         .stat-item {
@@ -225,12 +527,18 @@
             font-weight: bold;
         }
 
+        /* ===== SEARCH INPUT ===== */
         .search-container {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
+            position: relative;
+            z-index: 100;
+            pointer-events: auto;
+            /* Ensure no inherited animations */
+            animation: none !important;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
         }
 
         .search-input {
@@ -241,81 +549,96 @@
             color: #f7fafc;
             font-size: 1em;
             width: 300px;
+            max-width: 100%;
             transition: all 0.3s ease;
+            position: relative;
+            text-align: center;
         }
 
         .search-input:focus {
             outline: none;
             border-color: #ffd700;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4),
+                        0 0 40px rgba(255, 215, 0, 0.2);
+            animation: searchGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes searchGlow {
+            from {
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.4),
+                            0 0 40px rgba(255, 215, 0, 0.2);
+            }
+            to {
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.6),
+                            0 0 40px rgba(255, 215, 0, 0.3);
+            }
         }
 
         .search-input::placeholder {
             color: #a0aec0;
+            text-align: center;
         }
 
-        .legend {
-            position: fixed;
-            top: 80px;
-            left: 20px;
-            background: rgba(45, 55, 72, 0.95);
-            padding: 15px;
-            border-radius: 15px;
-            border: 1px solid #718096;
-            z-index: 1000;
-            min-width: 180px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 8px 0;
-            color: #e2e8f0;
-            font-size: 0.9em;
-        }
-
-        .legend-icon {
-            width: 25px;
-            height: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 5px;
-            font-size: 1em;
-        }
-
-        .legend-icon.male {
-            background: rgba(66, 153, 225, 0.2);
-            border: 1px solid #4299e1;
-        }
-
-        .legend-icon.female {
-            background: rgba(237, 100, 166, 0.2);
-            border: 1px solid #ed64a6;
-        }
-
-        .legend-icon.missing {
-            background: rgba(160, 174, 192, 0.2);
-            border: 1px dashed #a0aec0;
-        }
-
-        .legend-icon.spouse {
-            background: rgba(237, 137, 54, 0.2);
-            border: 1px solid #ed8936;
-        }
+        /* ===== PERSON CARDS ===== */
+        /* Removed duplicate CSS rules - these are defined above */
 
         .person-card.highlighted {
             border-color: #ffd700 !important;
             background: linear-gradient(145deg, #744210, #975a16) !important;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6) !important;
-            animation: pulse 1.5s infinite;
+            color: #ffffff !important;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8) !important;
+            /* Enhanced visibility */
+            transform: scale(1.05) !important;
+            z-index: 100 !important;
+            position: relative !important;
+            /* Force visibility */
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            /* Ensure text is readable */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8) !important;
+        }
+
+        /* Search highlighting - different style */
+        .person-card.search-highlighted {
+            border-color: #4299e1 !important;
+            background: linear-gradient(145deg, #2c5282, #3182ce) !important;
+            box-shadow: 0 0 30px rgba(66, 153, 225, 0.6) !important;
+            animation: searchPulse 1.5s infinite !important;
+            transform: scale(1.02) !important;
+            z-index: 10 !important;
+            position: relative !important;
         }
 
         @keyframes pulse {
             0% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); }
             50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.8); }
             100% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); }
+        }
+
+        @keyframes searchPulse {
+            0% { box-shadow: 0 0 30px rgba(66, 153, 225, 0.6); }
+            50% { box-shadow: 0 0 40px rgba(66, 153, 225, 0.8); }
+            100% { box-shadow: 0 0 30px rgba(66, 153, 225, 0.6); }
+        }
+
+        .person-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #f7fafc;
+            margin-bottom: 8px;
+            line-height: 1.3;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            word-wrap: break-word;
+        }
+
+        .person-gender {
+            font-size: 0.9em;
+            color: #cbd5e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
 
         .spouse-indicator {
@@ -341,13 +664,6 @@
             border-radius: 20px;
             position: relative;
             opacity: 0.8;
-        }
-
-        .person-card.missing-person:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 15px 40px rgba(160, 174, 192, 0.4);
-            border-color: #cbd5e0;
-            opacity: 1;
         }
 
         .person-card.missing-person::before {
@@ -398,56 +714,995 @@
             background: rgba(160, 174, 192, 0.1);
             border-radius: 8px;
             border-left: 3px solid #a0aec0;
+            }
+
+        /* Base legend positioning - always visible in 2D */
+        .legend {
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            padding: 15px;
+            min-width: 180px;
+            background: rgba(45, 55, 72, 0.95);
+            border-radius: 15px;
+            border: 2px solid #718096;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            /* Ensure proper layering */
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            /* Complete isolation from background animations */
+            will-change: auto;
+            backface-visibility: visible;
+            transform-style: flat;
+            isolation: auto;
+            contain: none;
+            /* Force hardware acceleration */
+            transform: none;
         }
 
+        /* Mobile drawer behavior - only on mobile */
         @media (max-width: 768px) {
+            .legend {
+                bottom: 20px;
+                top: auto;
+                left: -220px; /* Start off-screen on mobile */
+                border-radius: 0 15px 15px 0;
+                border-left: none;
+                transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            }
+
+            .legend.mobile-visible {
+                left: 0 !important; /* Slide into view on mobile */
+            }
+        }
+
+            .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            color: #e2e8f0;
+            font-size: 0.9em;
+        }
+
+        .legend-icon {
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .legend-icon.male {
+            background: rgba(66, 153, 225, 0.2);
+            border: 1px solid #4299e1;
+        }
+
+        .legend-icon.female {
+            background: rgba(237, 100, 166, 0.2);
+            border: 1px solid #ed64a6;
+        }
+
+        .legend-icon.missing {
+            background: rgba(160, 174, 192, 0.2);
+            border: 1px dashed #a0aec0;
+        }
+
+        .legend-icon.spouse {
+            background: rgba(237, 137, 54, 0.2);
+            border: 1px solid #ed8936;
+        }
+
+        .legend-icon.relationship {
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid #ffd700;
+        }
+
+        .offline-indicator {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(220, 38, 38, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+                font-size: 0.9em;
+            z-index: 10000;
+            display: none;
+        }
+
+        /* Mobile Toggle Button */
+        .mobile-toggle {
+            display: none;
+            position: relative;
+            background: rgba(45, 55, 72, 0.95);
+            color: #f7fafc;
+            border: 2px solid #718096;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            font-size: 1.5em;
+            transition: all 0.3s ease;
+            pointer-events: auto;
+            /* Ensure no inherited animations */
+            animation: none !important;
+            /* Enhanced styling */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+        }
+
+        .mobile-toggle:hover {
+            background: rgba(66, 153, 225, 0.9);
+            border-color: #4299e1;
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
+        }
+
+        .mobile-toggle.active {
+            background: rgba(255, 215, 0, 0.9);
+            border-color: #ffd700;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6),
+                        0 0 40px rgba(255, 215, 0, 0.3);
+            animation: mobileToggleNeon 1.5s ease-in-out infinite alternate;
+        }
+
+        .mobile-toggle:active {
+            transform: scale(0.95);
+            transition: transform 0.1s ease;
+        }
+
+        @keyframes mobileToggleNeon {
+            from {
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.6),
+                            0 0 40px rgba(255, 215, 0, 0.3);
+            }
+            to {
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.8),
+                            0 0 50px rgba(255, 215, 0, 0.4);
+            }
+        }
+
+        .mobile-toggle.active span {
+            transform: rotate(90deg);
+            transition: transform 0.3s ease;
+        }
+
+        /* Mobile-specific positioning */
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 1001;
+                background: rgba(45, 55, 72, 0.98);
+                border: 2px solid #ffd700;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            }
+        }
+
+        /* 3D mode styles */
+        .three-d-mode {
+            overflow: hidden;
+        }
+
+        .three-d-mode .tree-wrapper,
+        .three-d-mode .header,
+        .three-d-mode .legend,
+        .three-d-mode .controls,
+        .three-d-mode .statistics {
+            display: none !important;
+        }
+
+        /* Ensure 3D mode properly hides all 2D elements */
+        .three-d-mode .mobile-toggle {
+            display: none !important;
+        }
+
+        .three-d-mode .main-container {
+            padding: 0;
+            background: none;
+        }
+
+        .three-d-mode canvas {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            z-index: 10000;
+        }
+
+        /* 3D View Back Button */
+        .back-to-2d {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(145deg, #4a5568, #2d3748);
+            color: #f7fafc;
+            border: 2px solid #ffd700;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            z-index: 10001;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            display: none;
+        }
+
+        .back-to-2d:hover {
+            background: linear-gradient(145deg, #718096, #4a5568);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .back-to-2d:active {
+            transform: translateY(0);
+        }
+
+        .three-d-mode .back-to-2d {
+            display: block;
+        }
+
+
+
+        /* 3D Navigation Instructions */
+        .three-d-instructions {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.9em;
+            z-index: 10001;
+            max-width: 250px;
+            display: none;
+            border: 1px solid #ffd700;
+        }
+
+        .three-d-instructions h4 {
+            margin: 0 0 10px 0;
+            color: #ffd700;
+            font-size: 1em;
+        }
+
+        .three-d-instructions ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .three-d-instructions li {
+            margin: 5px 0;
+        }
+
+        .three-d-mode .three-d-instructions {
+            display: block;
+        }
+
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .person-card {
+                cursor: default;
+                -webkit-tap-highlight-color: transparent;
+                touch-action: manipulation;
+            }
+
+            .person-card:active {
+                transform: scale(0.98);
+                transition: transform 0.1s ease;
+            }
+
+            .controls button {
+                -webkit-tap-highlight-color: transparent;
+                touch-action: manipulation;
+                min-height: 44px;
+            }
+
+            .controls button:active {
+                transform: scale(0.95);
+                transition: transform 0.1s ease;
+            }
+
+            .mobile-toggle {
+                -webkit-tap-highlight-color: transparent;
+                touch-action: manipulation;
+            }
+
+            .mobile-toggle:active {
+                transform: scale(0.95);
+                transition: transform 0.1s ease;
+            }
+
+            /* Disable hover effects on touch devices */
+            .person-card:hover,
+            .controls button:hover,
+            .mobile-toggle:hover {
+                transform: none;
+                box-shadow: inherit;
+            }
+        }
+
+        /* Landscape orientation for mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .header {
+                margin-bottom: 8px;
+                padding: 8px 12px;
+            }
+
+            .header h1 {
+                font-size: 1.4em;
+                margin-bottom: 3px;
+            }
+
+            .header p {
+                font-size: 0.8em;
+                margin-bottom: 5px;
+            }
+
+            .header-controls {
+                flex-direction: row;
+                gap: 8px;
+                min-height: 35px;
+            }
+
+            .search-container {
+                order: 1;
+                margin-bottom: 0;
+                max-width: 180px;
+            }
+
+            .mobile-toggle {
+                order: 2;
+                position: relative;
+                top: auto;
+                right: auto;
+            }
+
+            .tree-wrapper {
+                padding: 8px 3px;
+                margin-top: 0;
+            }
+
+            .generation {
+                margin: 10px 0;
+                gap: 8px;
+                padding: 8px 0;
+            }
+
+            .person-card {
+                min-width: 110px;
+                max-width: 130px;
+                padding: 8px 6px;
+                margin: 3px;
+                min-height: 55px;
+            }
+
+            .generation-label {
+                font-size: 0.7em;
+                padding: 4px 8px;
+                margin-bottom: 8px;
+            }
+        }
+
+
+
+        /* High DPI mobile devices */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .person-card {
+                border-width: 1px;
+            }
+            
+            .controls button {
+                border-width: 1px;
+            }
+        }
+
+        /* Mobile 3D optimizations */
+        @media (max-width: 768px) {
+            /* Optimize 3D view for mobile */
+            .three-d-mode canvas {
+                touch-action: manipulation;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                user-select: none;
+            }
+
+            /* Mobile-friendly 3D instructions */
+            .three-d-instructions {
+                max-width: 200px;
+                font-size: 0.8em;
+                padding: 10px;
+            }
+
+            .three-d-instructions h4 {
+                font-size: 0.9em;
+                margin-bottom: 8px;
+            }
+
+            .three-d-instructions ul {
+                padding-left: 15px;
+            }
+
+            .three-d-instructions li {
+                margin: 3px 0;
+                font-size: 0.8em;
+            }
+
+            /* Mobile-friendly back button */
+            .back-to-2d {
+                padding: 10px 16px;
+                font-size: 0.9em;
+                border-radius: 20px;
+            }
+        }
+
+        .empty-generation-message {
+            color: #a0aec0;
+            font-style: italic;
+            padding: 20px;
+            text-align: center;
+            background: rgba(160, 174, 192, 0.1);
+            border: 1px dashed #a0aec0;
+            border-radius: 10px;
+            margin: 10px;
+            font-size: 0.9em;
+        }
+
+        .empty-generation-message::before {
+            content: '⚠️ ';
+            margin-right: 8px;
+        }
+
+
+
+
+
+        /* Mobile controls positioning and accessibility */
+        @media (max-width: 768px) {
+            .controls {
+                position: fixed;
+                bottom: 20px;
+                right: -220px; /* Start off-screen on mobile */
+                top: auto;
+                flex-direction: column;
+                gap: 5px;
+                background: rgba(45, 55, 72, 0.95);
+                padding: 15px;
+                border-radius: 15px;
+                border: 2px solid #718096;
+                transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                z-index: 1000;
+                min-width: 180px;
+                backdrop-filter: blur(10px);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            }
+
+            .controls.mobile-visible {
+                right: 0 !important; /* Slide into view on mobile - added !important */
+            }
+
+            .legend {
+                position: fixed;
+                bottom: 20px;
+                top: auto;
+                left: -220px; /* Start off-screen on mobile */
+                border-radius: 0 15px 15px 0;
+                border-left: none;
+                transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                max-width: 200px;
+            }
+
+            .legend.mobile-visible {
+                left: 0 !important; /* Slide into view on mobile - added !important */
+            }
+
+            .statistics {
+                position: fixed;
+                bottom: 20px;
+                top: auto;
+                left: 20px;
+                right: auto;
+                transform: none;
+                border-radius: 15px 15px 0 0;
+                border-bottom: none;
+                transition: bottom 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                max-width: 220px;
+                bottom: -200px; /* Start off-screen on mobile */
+            }
+
+            .statistics.mobile-visible {
+                bottom: 0 !important; /* Slide into view on mobile - added !important */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .controls {
+                bottom: 15px;
+                right: 15px;
+                padding: 12px;
+                min-width: 160px;
+            }
+
+            .legend {
+                bottom: 15px;
+                max-width: 180px;
+            }
+
+            .statistics {
+                bottom: 15px;
+                left: 15px;
+                max-width: 200px;
+            }
+        }
+
+        /* Final mobile optimizations */
+        @media (max-width: 768px) {
+            /* Ensure proper viewport usage */
+            body {
+                overflow-x: hidden;
+                height: auto;
+                min-height: auto;
+            }
+
+            /* Better touch targets and spacing */
+            .person-card {
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .person-card:active {
+                transform: scale(0.98);
+                transition: transform 0.1s ease;
+            }
+
+            /* Optimize generation spacing for mobile */
+            .generation {
+                justify-content: center;
+                align-items: center;
+            }
+
+            /* Ensure proper mobile navigation */
+            .mobile-toggle:active {
+                transform: scale(0.95);
+                transition: transform 0.1s ease;
+            }
+
+                    /* Mobile-friendly animations */
+        .generation.visible {
+            transform: none;
+            opacity: 1;
+        }
+
+        .generation:nth-child(even).visible {
+            transform: none;
+        }
+
+        /* Prevent horizontal scrolling */
+        .tree-wrapper {
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        /* Better mobile performance */
+        .person-card {
+            will-change: auto;
+            backface-visibility: visible;
+        }
+
+        /* Mobile-specific highlighting */
+        @media (max-width: 768px) {
+            .person-card.highlighted {
+                transform: scale(1.08) !important;
+                box-shadow: 0 0 25px rgba(255, 215, 0, 0.9) !important;
+                z-index: 200 !important;
+                /* Ensure mobile highlighting is visible */
+                border-width: 3px !important;
+            }
+        }
+        }
+
+        /* High DPI mobile devices */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .person-card {
+                border-width: 1px;
+            }
+            
+            .controls button {
+                border-width: 1px;
+            }
+
+            .generation-label {
+                border-width: 1px;
+            }
+        }
+
+        /* Ensure first generation is visible on mobile */
+        @media (max-width: 768px) {
+            .tree-wrapper {
+                padding-top: 0; /* Minimal top padding */
+                margin-top: 0;
+            }
+
+            .generation:first-child {
+                margin-top: 5px; /* Minimal top margin for first generation */
+            }
+
+            /* Optimize header height for mobile */
+            .header {
+                max-height: none; /* Remove height limit */
+                overflow: visible;
+            }
+
+            /* Ensure proper content flow */
+            .main-container {
+                display: block; /* Remove flex layout that was causing issues */
+                height: auto;
+                min-height: auto;
+            }
+
+            /* Optimize generation layout for mobile */
+            .generation {
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            /* Ensure person cards fit mobile screens */
+            .person-card {
+                flex-shrink: 0;
+                box-sizing: border-box;
+            }
+        }
+
+        /* ===== MOBILE RESPONSIVE DESIGN ===== */
+        @media (max-width: 768px) {
+            /* Main container and header */
+            .main-container {
+                padding: 5px;
+                width: 100vw;
+                height: auto;
+                min-height: auto;
+                overflow-x: hidden;
+            }
+
+            .header {
+                padding: 10px 15px;
+                margin-bottom: 10px;
+                border-radius: 10px;
+                position: relative;
+                top: auto;
+                max-height: none;
+                overflow: visible;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+                margin-bottom: 5px;
+                line-height: 1.2;
+            }
+
+            .header p {
+                font-size: 0.9em;
+                margin-bottom: 10px;
+                line-height: 1.3;
+            }
+
+            .header-controls {
+                margin-top: 10px;
+                gap: 10px;
+                min-height: 40px;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            /* Search container */
+            .search-container {
+                position: relative;
+                width: 100%;
+                max-width: 280px;
+                order: 1;
+                margin-bottom: 10px;
+                z-index: 100;
+            }
+
+            .search-input {
+                width: 100%;
+                font-size: 16px;
+                padding: 10px 12px;
+                background: rgba(45, 55, 72, 0.98);
+                backdrop-filter: blur(10px);
+                border: 2px solid #ffd700;
+                border-radius: 20px;
+                box-sizing: border-box;
+                text-align: center;
+            }
+
+            .search-input:focus {
+                border-color: #ffd700;
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+                outline: none;
+            }
+
+            /* Mobile toggle */
+            .mobile-toggle {
+                display: flex !important;
+                order: 2;
+                position: relative;
+                top: auto;
+                right: auto;
+                z-index: 101;
+                background: rgba(45, 55, 72, 0.98);
+                border: 2px solid #ffd700;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            }
+
+            /* Tree wrapper and generations */
+            .tree-wrapper {
+                padding: 5px;
+                margin-top: 0;
+                padding-top: 0;
+            }
+
+            .generation {
+                margin: 10px 0;
+                gap: 15px;
+                padding: 5px 0;
+            }
+
+            .generation:first-child {
+                margin-top: 5px;
+            }
+
+            .generation::before {
+                top: -10px;
+                left: 5%;
+                right: 5%;
+            }
+
+            /* Person cards */
+            .person-card {
+                min-width: 140px;
+                max-width: 160px;
+                padding: 12px 8px;
+                margin: 5px;
+                min-height: 70px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .person-name {
+                font-size: 0.9em;
+                line-height: 1.2;
+                margin-bottom: 5px;
+            }
+
+            .person-gender {
+                font-size: 0.75em;
+                gap: 3px;
+            }
+
+            /* Generation labels */
             .generation-label {
                 position: relative;
                 left: 0;
                 transform: none;
-                margin-bottom: 20px;
+                margin-bottom: 15px;
                 display: block;
                 text-align: center;
+                font-size: 0.8em;
+                padding: 6px 12px;
+                width: 100%;
+                max-width: 200px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            /* Controls buttons */
+            .controls button {
+                padding: 8px 12px;
+                font-size: 0.8em;
+                margin: 2px;
+                width: 100%;
+                min-height: 44px;
+            }
+
+            .legend-item {
+                font-size: 0.8em;
+                margin: 5px 0;
+            }
+
+            /* Ensure 3D button is accessible */
+            .controls button[onclick="toggle3DView()"] {
+                display: block !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 2px;
+            }
+
+            .header {
+                padding: 8px 12px;
+                margin-bottom: 8px;
+            }
+
+            .header h1 {
+                font-size: 1.6em;
+            }
+
+            .header p {
+                font-size: 0.8em;
+            }
+
+            .search-container {
+                max-width: 240px;
             }
 
             .search-input {
-                width: 250px;
+                font-size: 16px;
+                padding: 8px 10px;
+            }
+
+            .mobile-toggle {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3em;
+            }
+
+            .tree-wrapper {
+                padding: 2px;
+                margin-top: 0;
+                padding-top: 0;
+            }
+
+            .generation {
+                margin: 8px 0;
+                gap: 10px;
+            }
+
+            .generation:first-child {
+                margin-top: 2px;
             }
 
             .person-card {
-                min-width: 180px;
-                max-width: 220px;
+                min-width: 120px;
+                max-width: 140px;
+                padding: 10px 6px;
+                margin: 3px;
+                min-height: 60px;
+            }
+
+            .person-name {
+                font-size: 0.8em;
+            }
+
+            .person-gender {
+                font-size: 0.7em;
+            }
+
+            .generation-label {
+                font-size: 0.7em;
+                padding: 5px 10px;
+                max-width: 180px;
+            }
+            
+            .controls button {
+                padding: 6px 10px;
+                font-size: 0.75em;
+                min-height: 40px;
             }
         }
+
+        /* ===== HIGHLIGHT STATUS INDICATOR ===== */
+        .highlight-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid #ffd700;
+            border-radius: 20px;
+            color: #ffd700;
+            font-size: 0.9em;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .highlight-status.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .status-icon {
+            font-size: 1.1em;
+        }
+
+        .status-text {
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .highlight-status {
+                font-size: 0.8em;
+                padding: 6px 12px;
+                margin-top: 8px;
+            }
+        }
+
+        /* Relationship lines removed for cleaner interface */
     </style>
 </head>
 <body>
+    <!-- Animated background elements -->
+    <div class="floating-symbols">
+        <div class="floating-symbol">🌳</div>
+        <div class="floating-symbol">👨‍👩‍👧‍👦</div>
+        <div class="floating-symbol">💕</div>
+        <div class="floating-symbol">🏠</div>
+        <div class="floating-symbol">🌍</div>
+        <div class="floating-symbol">📚</div>
+        <div class="floating-symbol">🕰️</div>
+        <div class="floating-symbol">🌟</div>
+    </div>
+    
+    <div class="connection-lines-bg">
+        <div class="connection-line-bg"></div>
+        <div class="connection-line-bg"></div>
+        <div class="connection-line-bg"></div>
+        <div class="connection-line-bg"></div>
+    </div>
+
     <div class="main-container">
         <div class="header">
             <h1>🌲 Igisekuru</h1>
             <p>Celebrating our family's legacy through generations</p>
-        </div>
-
-        <div class="search-container">
-            <input type="text" class="search-input" placeholder="🔍 Search family members..." id="searchInput">
+            <div class="header-controls">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="🔍 Search family members..." id="searchInput">
+                </div>
+                <div class="mobile-toggle" id="mobileToggle">
+                    <span>☰</span>
+                </div>
+            </div>
+           
         </div>
 
         <div class="legend">
             <div class="legend-item">
                 <div class="legend-icon male">👨🏾</div>
-                <span>Male</span>
+                <span id="legendMale">Male</span>
             </div>
             <div class="legend-item">
                 <div class="legend-icon female">👧🏾</div>
-                <span>Female</span>
+                <span id="legendFemale">Female</span>
             </div>
             <div class="legend-item">
                 <div class="legend-icon missing">❓</div>
-                <span>Unknown/Missing</span>
+                <span id="legendMissing">Unknown/Missing</span>
             </div>
             <div class="legend-item">
                 <div class="legend-icon spouse">💑</div>
-                <span>Married</span>
+                <span id="legendSpouse">Married</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon relationship">⭐</div>
+                <span>Click names to highlight relationships</span>
             </div>
         </div>
 
@@ -456,13 +1711,29 @@
         </div>
     </div>
 
-            <div class="controls">
-            <button onclick="expandAll()">📖 Expand All</button>
-            <button onclick="collapseAll()">📋 Collapse</button>
+            <div class="controls" id="controls">
             <button onclick="centerView()">🎯 Center</button>
-            <button onclick="printView()">🖨️ Print</button>
-            <button onclick="shareTree()">📤 Share</button>
+            <button onclick="toggle3DView()">🌐 3D View</button>
         </div>
+
+
+
+    <div class="back-to-2d" id="backTo2D" onclick="exit3DView()">
+        ← Back to 2D View
+    </div>
+    
+
+
+         <div class="three-d-instructions" id="threeDInstructions">
+          <h4>🎮 3D Navigation</h4>
+          <ul>
+              <li><strong>Mouse:</strong> Click & drag to rotate</li>
+              <li><strong>Scroll:</strong> Zoom in/out</li>
+              <li><strong>Click:</strong> Select family member</li>
+              <li><strong>Double-click:</strong> Focus on person</li>
+              <li><strong>Colors:</strong> Blue = Male, Pink = Female</li>
+          </ul>
+      </div>
 
     <div class="statistics" id="statistics">
         <!-- Statistics will be populated here -->
@@ -514,7 +1785,7 @@
                 { "id": "nkusi", "name": "Nkusi Heriman", "gender": "M" },
                 { "id": "mukabideri", "name": "Mukabideri Belancilla", "gender": "F" },
                 { "id": "mukandimbira", "name": "Mukandimbira Dancilla", "gender": "F" },
-                { "id": "unknown_father", "name": "Unknown Forefather", "gender": "M", "isMissing": true, "notes": "Father of Rudahunikira. Name lost to history." }
+                { "id": "unknown_father", "name": "Forefather", "gender": "M", "isMissing": true, "notes": "Father of Rudahunikira." }
             ],
             "relationships": [
                 { "type": "spouse", "fromId": "gahenda", "toId": "mitunga" },
@@ -586,6 +1857,21 @@
         function buildGenerationStructure() {
             generationStructure = {};
             
+            // First, create a map of all parent-child relationships
+            const parentChildMap = new Map();
+            const childParentMap = new Map();
+            
+            familyData.relationships.forEach(rel => {
+                if (rel.type === 'parent') {
+                    if (!parentChildMap.has(rel.fromId)) {
+                        parentChildMap.set(rel.fromId, []);
+                    }
+                    parentChildMap.get(rel.fromId).push(rel.toId);
+                    
+                    childParentMap.set(rel.toId, rel.fromId);
+                }
+            });
+            
             function assignGeneration(personId, generation) {
                 if (!generationStructure[generation]) {
                     generationStructure[generation] = [];
@@ -595,10 +1881,9 @@
                     generationStructure[generation].push(personId);
                     
                     // Find children and assign them to next generation
-                    familyData.relationships.forEach(rel => {
-                        if (rel.type === 'parent' && rel.fromId === personId) {
-                            assignGeneration(rel.toId, generation + 1);
-                        }
+                    const children = parentChildMap.get(personId) || [];
+                    children.forEach(childId => {
+                        assignGeneration(childId, generation + 1);
                     });
                 }
             }
@@ -607,7 +1892,46 @@
             const children = new Set(familyData.relationships.filter(r => r.type === 'parent').map(r => r.toId));
             const roots = familyData.people.filter(p => !children.has(p.id));
             
+            // Assign generations starting from roots
             roots.forEach(root => assignGeneration(root.id, 0));
+            
+            // Handle any remaining people who might not be connected to roots
+            // This can happen if there are disconnected family branches
+            familyData.people.forEach(person => {
+                let found = false;
+                for (let gen in generationStructure) {
+                    if (generationStructure[gen].includes(person.id)) {
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if (!found) {
+                    // Find the highest generation this person could belong to
+                    let maxGen = 0;
+                    for (let gen in generationStructure) {
+                        maxGen = Math.max(maxGen, parseInt(gen));
+                    }
+                    
+                    // Place them in the next generation
+                    if (!generationStructure[maxGen + 1]) {
+                        generationStructure[maxGen + 1] = [];
+                    }
+                    generationStructure[maxGen + 1].push(person.id);
+                }
+            });
+            
+            // Clean up empty generations and sort
+            const cleanedStructure = {};
+            Object.keys(generationStructure)
+                .sort((a, b) => parseInt(a) - parseInt(b))
+                .forEach(genKey => {
+                    if (generationStructure[genKey].length > 0) {
+                        cleanedStructure[genKey] = generationStructure[genKey];
+                    }
+                });
+            
+            generationStructure = cleanedStructure;
         }
 
         function createPersonCard(person) {
@@ -634,25 +1958,33 @@
                 card.innerHTML = `
                     <div class="person-name">${person.name}</div>
                     <div class="person-gender">
-                        ${person.gender === 'M' ? '👨‍💼' : '👩‍💼'}
+                        ${person.gender === 'M' ? '👨🏾' : '👩🏾'}
                         ${person.gender === 'M' ? 'Male' : 'Female'}
                     </div>
-                    ${isSpouse ? '<div class="spouse-indicator">💑</div>' : ''}
+                    ${isSpouse ? '<div class="spouse-indicator">👨‍👩‍👧‍👦</div>' : ''}
                 `;
             }
 
-            card.addEventListener('click', () => highlightRelatives(person.id));
+            card.addEventListener('click', (e) => {
+                highlightRelatives(person.id);
+            });
             
             return card;
         }
 
         function renderFamilyTree() {
             const wrapper = document.getElementById('treeWrapper');
+            
             wrapper.innerHTML = '';
 
             const generations = Object.keys(generationStructure).sort((a, b) => parseInt(a) - parseInt(b));
             
-            generations.forEach(genKey => {
+            if (generations.length === 0) {
+                wrapper.innerHTML = '<div style="text-align: center; color: #e2e8f0; padding: 40px;">No family data available</div>';
+                return;
+            }
+            
+            generations.forEach((genKey, index) => {
                 const generation = document.createElement('div');
                 generation.className = 'generation';
                 
@@ -662,6 +1994,13 @@
                 generation.appendChild(label);
 
                 const people = generationStructure[genKey];
+                
+                if (!people || people.length === 0) {
+                    const emptyMessage = document.createElement('div');
+                    emptyMessage.className = 'empty-generation-message';
+                    emptyMessage.textContent = 'No members in this generation';
+                    generation.appendChild(emptyMessage);
+                } else {
                 people.forEach(personId => {
                     if (peopleMap[personId]) {
                         const card = createPersonCard(peopleMap[personId]);
@@ -672,9 +2011,17 @@
                         generation.appendChild(placeholderCard);
                     }
                 });
+                }
 
                 wrapper.appendChild(generation);
+                
+                // Add animation delay for staggered entrance
+                setTimeout(() => {
+                    generation.classList.add('visible');
+                }, index * 200);
             });
+
+
 
             updateStatistics();
         }
@@ -693,7 +2040,9 @@
                 <div class="missing-notes">Information about this ancestor has been lost to history</div>
             `;
 
-            card.addEventListener('click', () => highlightRelatives(personId));
+            card.addEventListener('click', (e) => {
+                highlightRelatives(personId);
+            });
             
             return card;
         }
@@ -726,66 +2075,1147 @@
         }
 
         function highlightRelatives(personId) {
-            // Clear previous highlights
+            // Only clear highlights if clicking a different person
+            if (window.currentHighlightedPerson !== personId) {
+                // Clear previous highlights
+                clearHighlights();
+                clearSearchHighlights();
+                
+                // Highlight the selected person
+                const selectedCard = document.querySelector(`[data-person-id="${personId}"]`);
+                
+                if (selectedCard) {
+                    selectedCard.classList.add('highlighted');
+                }
+
+                // Find and highlight relatives
+                const relatives = new Set();
+                
+                familyData.relationships.forEach(rel => {
+                    if (rel.fromId === personId) {
+                        relatives.add(rel.toId);
+                    }
+                    if (rel.toId === personId) {
+                        relatives.add(rel.fromId);
+                    }
+                });
+
+                // Highlight relative cards
+                relatives.forEach(relativeId => {
+                    const card = document.querySelector(`[data-person-id="${relativeId}"]`);
+                    if (card) {
+                        card.classList.add('highlighted');
+                    }
+                });
+
+
+
+                // Store the current highlighted person for persistent highlighting
+                window.currentHighlightedPerson = personId;
+                
+                // Show status indicator
+                showHighlightStatus();
+            }
+        }
+
+        function clearHighlights() {
             document.querySelectorAll('.person-card').forEach(card => {
                 card.classList.remove('highlighted');
             });
-
-            // Highlight the selected person
-            const selectedCard = document.querySelector(`[data-person-id="${personId}"]`);
-            if (selectedCard) {
-                selectedCard.classList.add('highlighted');
-            }
-
-            // Find and highlight relatives
-            const relatives = new Set();
+            window.currentHighlightedPerson = null;
             
-            familyData.relationships.forEach(rel => {
-                if (rel.fromId === personId) {
-                    relatives.add(rel.toId);
-                }
-                if (rel.toId === personId) {
-                    relatives.add(rel.fromId);
-                }
-            });
 
-            relatives.forEach(relativeId => {
-                const card = document.querySelector(`[data-person-id="${relativeId}"]`);
-                if (card) {
-                    card.classList.add('highlighted');
-                }
+            
+            // Hide status indicator
+            hideHighlightStatus();
+        }
+
+        function clearSearchHighlights() {
+            // Clear only search highlights, preserve relationship highlights
+            document.querySelectorAll('.person-card').forEach(card => {
+                card.classList.remove('search-highlighted');
             });
+        }
+
+
+
+        function showHighlightStatus() {
+            const statusElement = document.getElementById('highlightStatus');
+            if (statusElement) {
+                statusElement.style.display = 'flex';
+                setTimeout(() => {
+                    statusElement.classList.add('visible');
+                }, 10);
+            }
+        }
+
+        function hideHighlightStatus() {
+            const statusElement = document.getElementById('highlightStatus');
+            if (statusElement) {
+                statusElement.classList.remove('visible');
+                setTimeout(() => {
+                    statusElement.style.display = 'none';
+                }, 300);
+            }
         }
 
         function setupSearch() {
             const searchInput = document.getElementById('searchInput');
+            
+            // Ensure search input is empty on initialization
+            searchInput.value = '';
+            
             searchInput.addEventListener('input', (e) => {
-                const query = e.target.value.toLowerCase();
+                const query = e.target.value.toLowerCase().trim();
                 
-                document.querySelectorAll('.person-card').forEach(card => {
-                    const name = card.querySelector('.person-name').textContent.toLowerCase();
-                    if (query && name.includes(query)) {
-                        card.classList.add('highlighted');
+                // If there's a search query, highlight matching names
+                if (query && query.length > 0) {
+                    // Clear previous search highlights but keep relationship highlights
+                    clearSearchHighlights();
+                    
+                    // Add search highlighting
+                    document.querySelectorAll('.person-card').forEach(card => {
+                        const name = card.querySelector('.person-name').textContent.toLowerCase();
+                        if (name.includes(query)) {
+                            card.classList.add('search-highlighted');
+                        }
+                    });
+                } else {
+                    // If no search query, restore relationship highlighting if exists
+                    if (window.currentHighlightedPerson) {
+                        clearSearchHighlights(); // Clear search highlights first
+                        // Don't call highlightRelatives here to avoid conflicts
+                        // Just restore the existing highlighting
+                        const selectedCard = document.querySelector(`[data-person-id="${window.currentHighlightedPerson}"]`);
+                        if (selectedCard) {
+                            selectedCard.classList.add('highlighted');
+                        }
+                        
+                        // Restore relative highlighting
+                        const relatives = new Set();
+                        familyData.relationships.forEach(rel => {
+                            if (rel.fromId === window.currentHighlightedPerson) {
+                                relatives.add(rel.toId);
+                            }
+                            if (rel.toId === window.currentHighlightedPerson) {
+                                relatives.add(rel.fromId);
+                            }
+                        });
+                        
+                        relatives.forEach(relativeId => {
+                            const card = document.querySelector(`[data-person-id="${relativeId}"]`);
+                            if (card) {
+                                card.classList.add('highlighted');
+                            }
+                        });
                     } else {
-                        card.classList.remove('highlighted');
+                        // Clear all highlights if no relationship is active
+                        clearHighlights();
+                        clearSearchHighlights();
+                    }
+                }
+            });
+
+            // Keyboard navigation
+            document.addEventListener('keydown', handleKeyboardNavigation);
+        }
+
+        function handleKeyboardNavigation(e) {
+            const highlightedCards = document.querySelectorAll('.person-card.highlighted');
+            const allCards = document.querySelectorAll('.person-card');
+            let currentIndex = -1;
+
+            if (highlightedCards.length > 0) {
+                currentIndex = Array.from(allCards).indexOf(highlightedCards[0]);
+            }
+
+            switch(e.key) {
+                case 'ArrowRight':
+                case 'ArrowDown':
+                    e.preventDefault();
+                    navigateToCard(currentIndex + 1, allCards);
+                    break;
+                case 'ArrowLeft':
+                case 'ArrowUp':
+                    e.preventDefault();
+                    navigateToCard(currentIndex - 1, allCards);
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    if (highlightedCards.length > 0) {
+                        const personId = highlightedCards[0].dataset.personId;
+                        highlightRelatives(personId);
+                    }
+                    break;
+                case 'Escape':
+                    e.preventDefault();
+                    clearHighlights();
+                    break;
+                case 'h':
+                case 'H':
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        document.getElementById('searchInput').focus();
+                    }
+                    break;
+
+                case '3':
+                    if (e.ctrlKey || e.metaKey) {
+                        e.preventDefault();
+                        centerView();
+                    }
+                    break;
+
+            }
+        }
+
+        function navigateToCard(index, allCards) {
+            clearHighlights();
+            if (index >= 0 && index < allCards.length) {
+                allCards[index].classList.add('highlighted');
+                allCards[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function setupMobileToggle() {
+            const mobileToggle = document.getElementById('mobileToggle');
+            const controls = document.getElementById('controls');
+            const legend = document.querySelector('.legend');
+            const statistics = document.getElementById('statistics');
+
+            if (!mobileToggle || !controls || !legend || !statistics) {
+                console.error('Mobile toggle elements not found');
+                return;
+            }
+
+            // Initialize mobile state
+            function initializeMobileState() {
+                if (window.innerWidth <= 768) {
+                    // Mobile view - show toggle, hide elements off-screen
+                    mobileToggle.style.display = 'flex';
+                    controls.classList.remove('mobile-visible');
+                    legend.classList.remove('mobile-visible');
+                    statistics.classList.remove('mobile-visible');
+                    mobileToggle.classList.remove('active');
+                    
+                    // Remove any inline styles that might interfere
+                    controls.style.removeProperty('right');
+                    legend.style.removeProperty('left');
+                    statistics.style.removeProperty('bottom');
+                    statistics.style.removeProperty('top');
+                } else {
+                    // Desktop view - hide toggle, show elements normally
+                    mobileToggle.style.display = 'none';
+                    // Ensure elements are visible on desktop
+                    controls.classList.remove('mobile-visible');
+                    legend.classList.remove('mobile-visible');
+                    statistics.classList.remove('mobile-visible');
+                    mobileToggle.classList.remove('active');
+                    
+                    // Remove any inline styles for desktop
+                    controls.style.removeProperty('right');
+                    legend.style.removeProperty('left');
+                    statistics.style.removeProperty('bottom');
+                    statistics.style.removeProperty('top');
+                }
+            }
+
+            // Initialize on load
+            initializeMobileState();
+
+            mobileToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Toggle all drawers
+                const isOpen = controls.classList.contains('mobile-visible');
+                
+                if (isOpen) {
+                    // Close all drawers
+                    controls.classList.remove('mobile-visible');
+                    legend.classList.remove('mobile-visible');
+                    statistics.classList.remove('mobile-visible');
+                    mobileToggle.classList.remove('active');
+                } else {
+                    // Open all drawers
+                    controls.classList.add('mobile-visible');
+                    legend.classList.add('mobile-visible');
+                    statistics.classList.add('mobile-visible');
+                    mobileToggle.classList.add('active');
+                }
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                initializeMobileState();
+            });
+
+            // Ensure mobile toggle is visible on mobile
+            if (window.innerWidth <= 768) {
+                mobileToggle.style.display = 'flex';
+            }
+        }
+
+        function setupOfflineSupport() {
+            // Simple offline indicator
+            const offlineIndicator = document.createElement('div');
+            offlineIndicator.id = 'offlineIndicator';
+            offlineIndicator.className = 'offline-indicator';
+            offlineIndicator.innerHTML = '📡 Offline Mode';
+            offlineIndicator.style.display = 'none';
+            document.body.appendChild(offlineIndicator);
+
+            // Listen for online/offline events
+            window.addEventListener('online', () => {
+                offlineIndicator.style.display = 'none';
+            });
+
+            window.addEventListener('offline', () => {
+                offlineIndicator.style.display = 'block';
+            });
+
+            // Check initial status
+            if (!navigator.onLine) {
+                offlineIndicator.style.display = 'block';
+            }
+        }
+
+
+
+
+        // 3D Family Tree View
+        let is3DView = false;
+        let scene, camera, renderer, controls;
+        let familyNodes = [];
+
+        function toggle3DView() {
+            if (is3DView) {
+                exit3DView();
+            } else {
+                enter3DView();
+            }
+        }
+
+        function enter3DView() {
+            is3DView = true;
+            document.body.classList.add('three-d-mode');
+            
+            // Hide 2D tree and other elements
+            document.getElementById('treeWrapper').style.display = 'none';
+            
+            // Create 3D scene
+            create3DScene();
+            
+            // Update button text
+            const button = document.querySelector('button[onclick="toggle3DView()"]');
+            button.textContent = '📋 2D View';
+            
+            // Show back button and instructions
+            document.getElementById('backTo2D').style.display = 'block';
+            document.getElementById('threeDInstructions').style.display = 'block';
+            
+            // Add smooth transition effect
+            document.body.style.transition = 'all 0.5s ease';
+        }
+
+        function exit3DView() {
+            is3DView = false;
+            document.body.classList.remove('three-d-mode');
+            
+            // Show 2D tree and other elements
+            document.getElementById('treeWrapper').style.display = 'block';
+            
+            // Hide back button and instructions
+            document.getElementById('backTo2D').style.display = 'none';
+            document.getElementById('threeDInstructions').style.display = 'none';
+            
+            // Clean up 3D scene
+            if (renderer) {
+                renderer.dispose();
+                if (renderer.domElement.parentNode) {
+                    renderer.domElement.parentNode.removeChild(renderer.domElement);
+                }
+            }
+            
+            // Update button text
+            const button = document.querySelector('button[onclick="toggle3DView()"]');
+            button.textContent = '🌐 3D View';
+            
+            // Reset body transition
+            document.body.style.transition = '';
+            
+            // Clear any relationship highlights
+            clear3DRelationships();
+        }
+
+        function create3DScene() {
+            // Create scene with modern, beautiful background
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0e17); // Darker, more modern
+
+            // Create camera with better initial position
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 8, 15);
+
+            // Create renderer with mobile-first optimization
+            const isMobile = window.innerWidth <= 768;
+            renderer = new THREE.WebGLRenderer({ 
+                antialias: !isMobile, // Disable antialiasing on mobile for performance
+                alpha: true,
+                powerPreference: isMobile ? "default" : "high-performance",
+                preserveDrawingBuffer: false,
+                stencil: false,
+                depth: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = !isMobile; // Disable shadows on mobile for performance
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.shadowMap.autoUpdate = !isMobile;
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1 : 2)); // Cap at 1x on mobile
+            renderer.outputEncoding = THREE.sRGBEncoding;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.4; // Slightly brighter
+            document.body.appendChild(renderer.domElement);
+
+            // Modern lighting system
+            const ambientLight = new THREE.AmbientLight(0x4a5568, 0.4); // Subtle ambient
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
+            directionalLight.position.set(10, 10, 5);
+            if (!isMobile) {
+                directionalLight.castShadow = true;
+                directionalLight.shadow.mapSize.width = 2048;
+                directionalLight.shadow.mapSize.height = 2048;
+            }
+            scene.add(directionalLight);
+
+            // Modern accent lighting
+            if (!isMobile) {
+                const accentLight1 = new THREE.PointLight(0x667eea, 0.4, 30); // Modern blue
+                accentLight1.position.set(-8, 6, 8);
+                scene.add(accentLight1);
+
+                const accentLight2 = new THREE.PointLight(0xf093fb, 0.3, 30); // Modern pink
+                accentLight2.position.set(8, 6, -8);
+                scene.add(accentLight2);
+            }
+
+            // Create modern background environment
+            createModernBackground();
+
+            // Create family tree nodes
+            createFamilyNodes();
+
+            // Modern, responsive controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05; // Smooth damping
+            controls.maxDistance = isMobile ? 30 : 40;
+            controls.minDistance = isMobile ? 3 : 5;
+            controls.maxPolarAngle = Math.PI / 2;
+            
+            // Mobile-first controls
+            if (isMobile) {
+                controls.enablePan = false;
+                controls.rotateSpeed = 0.8; // Responsive but controlled
+                controls.zoomSpeed = 0.8;
+                controls.enableKeys = false;
+            } else {
+                controls.rotateSpeed = 1.0; // Smooth desktop experience
+                controls.zoomSpeed = 1.0;
+            }
+
+            // Add click event listener
+            renderer.domElement.addEventListener('click', on3DClick);
+
+            // Setup hover effects (only on desktop)
+            if (!isMobile) {
+                setup3DHoverEffects();
+            }
+
+            // Modern mobile gesture controls
+            if (isMobile) {
+                setupModernMobileControls();
+            }
+
+            // Start animation loop
+            animate();
+        }
+
+        // Create modern, beautiful background environment
+        function createModernBackground() {
+            const isMobile = window.innerWidth <= 768;
+            
+            // Create a subtle gradient background
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 256;
+            canvas.height = 256;
+            
+            const gradient = context.createRadialGradient(128, 128, 0, 128, 128, 128);
+            gradient.addColorStop(0, '#1a202c');
+            gradient.addColorStop(0.5, '#2d3748');
+            gradient.addColorStop(1, '#4a5568');
+            
+            context.fillStyle = gradient;
+            context.fillRect(0, 0, 256, 256);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(4, 4);
+            
+            // Create a large sphere for the background
+            const backgroundGeometry = new THREE.SphereGeometry(200, 32, 32);
+            const backgroundMaterial = new THREE.MeshBasicMaterial({
+                map: texture,
+                side: THREE.BackSide,
+                transparent: true,
+                opacity: 0.3
+            });
+            
+            const background = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
+            scene.add(background);
+            
+            // Add subtle floating elements for modern aesthetic
+            if (!isMobile) {
+                createFloatingElements();
+            }
+        }
+
+        // Create subtle floating geometric elements
+        function createFloatingElements() {
+            const elementCount = 8;
+            
+            for (let i = 0; i < elementCount; i++) {
+                const geometry = new THREE.OctahedronGeometry(0.5 + Math.random() * 0.5);
+                const material = new THREE.MeshBasicMaterial({
+                    color: new THREE.Color().setHSL(Math.random(), 0.3, 0.6),
+                    transparent: true,
+                    opacity: 0.1
+                });
+                
+                const element = new THREE.Mesh(geometry, material);
+                element.position.set(
+                    (Math.random() - 0.5) * 60,
+                    (Math.random() - 0.5) * 60,
+                    (Math.random() - 0.5) * 60
+                );
+                
+                element.userData.originalPosition = element.position.clone();
+                element.userData.animationOffset = Math.random() * Math.PI * 2;
+                
+                scene.add(element);
+                scene.userData.floatingElements = scene.userData.floatingElements || [];
+                scene.userData.floatingElements.push(element);
+            }
+        }
+
+        function createFamilyNodes() {
+            const generations = Object.keys(generationStructure).sort((a, b) => parseInt(a) - parseInt(b));
+            
+            generations.forEach((genKey, genIndex) => {
+                const people = generationStructure[genKey];
+                const radius = (genIndex + 1) * 4; // Increased spacing
+                const angleStep = (2 * Math.PI) / Math.max(people.length, 1);
+                
+                people.forEach((personId, personIndex) => {
+                    const person = peopleMap[personId];
+                    if (person) {
+                        const angle = personIndex * angleStep;
+                        const x = Math.cos(angle) * radius;
+                        const z = Math.sin(angle) * radius;
+                        const y = -genIndex * 3; // Increased vertical spacing
+                        
+                        createPersonNode(person, x, y, z, genIndex);
                     }
                 });
             });
+
+            // Add connecting lines between generations
+            addGenerationConnections();
         }
 
-        function expandAll() {
-            document.querySelectorAll('.generation').forEach(gen => {
-                gen.style.display = 'flex';
-            });
-        }
-
-        function collapseAll() {
-            document.querySelectorAll('.generation').forEach((gen, index) => {
-                if (index > 0) {
-                    gen.style.display = 'none';
+        function addGenerationConnections() {
+            const generations = Object.keys(generationStructure).sort((a, b) => parseInt(a) - parseInt(b));
+            
+            generations.forEach((genKey, genIndex) => {
+                if (genIndex < generations.length - 1) {
+                    const currentGen = generationStructure[genKey];
+                    const nextGen = generationStructure[generations[genIndex + 1]];
+                    
+                    // Connect each person to their children
+                    currentGen.forEach(personId => {
+                        const relationships = familyData.relationships.filter(rel => 
+                            rel.type === 'parent' && rel.fromId === personId
+                        );
+                        
+                        relationships.forEach(rel => {
+                            const parentNode = familyNodes.find(n => n.userData.person.id === rel.fromId);
+                            const childNode = familyNodes.find(n => n.userData.person.id === rel.toId);
+                            
+                            if (parentNode && childNode) {
+                                const geometry = new THREE.BufferGeometry().setFromPoints([
+                                    parentNode.position,
+                                    childNode.position
+                                ]);
+                                
+                                const material = new THREE.LineBasicMaterial({ 
+                                    color: 0x4a5568, 
+                                    linewidth: 1,
+                                    transparent: true,
+                                    opacity: 0.3
+                                });
+                                
+                                const line = new THREE.Line(geometry, material);
+                                scene.add(line);
+                            }
+                        });
+                    });
                 }
             });
         }
+
+        function createPersonNode(person, x, y, z, generation) {
+            const isMobile = window.innerWidth <= 768;
+            
+            // Create modern geometry with better detail
+            const geometry = new THREE.SphereGeometry(isMobile ? 0.4 : 0.5, isMobile ? 20 : 32, isMobile ? 20 : 32);
+            
+            // Use existing color scheme from 2D view
+            let baseColor;
+            if (person.gender === 'M') {
+                baseColor = 0x4299e1; // Male blue (#4299e1)
+            } else {
+                baseColor = 0xed64a6; // Female pink (#ed64a6)
+            }
+            
+            const material = new THREE.MeshPhongMaterial({ 
+                color: baseColor,
+                transparent: true,
+                opacity: person.isMissing ? 0.8 : 1,
+                shininess: isMobile ? 80 : 150,
+                specular: 0x888888,
+                emissive: 0x222222 // Subtle modern glow
+            });
+            
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.set(x, y, z);
+            if (!isMobile) {
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+            }
+            
+            // Modern animation system
+            mesh.userData.originalY = y;
+            mesh.userData.animationOffset = Math.random() * Math.PI * 2;
+            mesh.userData.originalScale = mesh.scale.clone();
+            mesh.userData.rotationSpeed = 0.01 + Math.random() * 0.02;
+            
+            // Store person data and position
+            mesh.userData = { 
+                person: person, 
+                originalColor: material.color.clone(),
+                originalScale: mesh.scale.clone(),
+                originalY: y,
+                animationOffset: Math.random() * Math.PI * 2,
+                pulsePhase: Math.random() * Math.PI * 2,
+                rotationSpeed: 0.01 + Math.random() * 0.02
+            };
+            
+            scene.add(mesh);
+            familyNodes.push(mesh);
+
+            // Create high-quality text label with mobile optimization
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            
+            // Use appropriate canvas size for mobile
+            const devicePixelRatio = window.devicePixelRatio || 1;
+            const canvasWidth = isMobile ? 512 : 1024;
+            const canvasHeight = isMobile ? 128 : 256;
+            
+            canvas.width = canvasWidth * devicePixelRatio;
+            canvas.height = canvasHeight * devicePixelRatio;
+            
+            // Scale context to match device pixel ratio
+            context.scale(devicePixelRatio, devicePixelRatio);
+            
+            // Set actual canvas size for display
+            canvas.style.width = canvasWidth + 'px';
+            canvas.style.height = canvasHeight + 'px';
+            
+            // Enable text rendering optimizations
+            context.textRenderingOptimization = 'optimizeQuality';
+            context.imageSmoothingEnabled = true;
+            context.imageSmoothingQuality = 'high';
+            
+            // Create gradient background for better readability
+            const gradient = context.createLinearGradient(0, 0, 0, canvasHeight);
+            gradient.addColorStop(0, 'rgba(0, 0, 0, 0.9)');
+            gradient.addColorStop(0.5, 'rgba(0, 0, 0, 0.8)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0.9)');
+            context.fillStyle = gradient;
+            context.fillRect(0, 0, canvasWidth, canvasHeight);
+            
+            // Add subtle border with glow effect
+            context.shadowColor = person.gender === 'M' ? '#4299e1' : '#ed64a6';
+            context.shadowBlur = isMobile ? 8 : 15;
+            context.shadowOffsetX = 0;
+            context.shadowOffsetY = 0;
+            context.strokeStyle = person.gender === 'M' ? '#4299e1' : '#ed64a6';
+            context.lineWidth = isMobile ? 2 : 4;
+            context.strokeRect(2, 2, canvasWidth - 4, canvasHeight - 4);
+            
+            // Reset shadow for text
+            context.shadowColor = 'transparent';
+            context.shadowBlur = 0;
+            
+            // Use high-quality font with better rendering
+            const fontSize = isMobile ? 20 : 32;
+            context.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif`;
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            
+            // Add text shadow for better readability
+            context.shadowColor = 'rgba(0, 0, 0, 0.8)';
+            context.shadowBlur = isMobile ? 2 : 3;
+            context.shadowOffsetX = 1;
+            context.shadowOffsetY = 1;
+            
+            // Split long names and render with optimal positioning
+            const nameParts = person.name.split(' ');
+            const centerX = canvasWidth / 2;
+            const centerY = canvasHeight / 2;
+            
+            if (nameParts.length > 2 && !isMobile) {
+                // First line
+                context.fillStyle = '#ffffff';
+                context.fillText(nameParts.slice(0, 2).join(' '), centerX, centerY - 20);
+                
+                // Second line
+                context.fillText(nameParts.slice(2).join(' '), centerX, centerY + 20);
+                
+                // Add subtle highlight
+                context.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                context.fillText(nameParts.slice(0, 2).join(' '), centerX, centerY - 22);
+                context.fillText(nameParts.slice(2).join(' '), centerX, centerY + 18);
+            } else {
+                // Single line with highlight (optimized for mobile)
+                const displayName = isMobile && nameParts.length > 2 ? 
+                    nameParts[0] + ' ' + nameParts[1] + '...' : person.name;
+                
+                context.fillStyle = '#ffffff';
+                context.fillText(displayName, centerX, centerY);
+                
+                // Add subtle highlight
+                context.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                context.fillText(displayName, centerX, centerY - 2);
+            }
+            
+            // Create high-quality texture
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.generateMipmaps = false;
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+            texture.format = THREE.RGBAFormat;
+            
+            const labelMaterial = new THREE.SpriteMaterial({ 
+                map: texture,
+                transparent: true,
+                opacity: 0.95
+            });
+            
+            const label = new THREE.Sprite(labelMaterial);
+            label.position.set(x, y + (isMobile ? 1.2 : 1.5), z); // Increased height to float above circles
+            label.scale.set(isMobile ? 2 : 4, isMobile ? 0.5 : 1, 1); // Adjusted scale for mobile
+            
+            // Store label reference
+            mesh.userData.label = label;
+            
+            scene.add(label);
+
+            // Add glow effect for missing persons (reduced on mobile)
+            if (person.isMissing) {
+                const glowGeometry = new THREE.SphereGeometry(isMobile ? 0.4 : 0.6, isMobile ? 8 : 16, isMobile ? 8 : 16);
+                const glowMaterial = new THREE.MeshBasicMaterial({
+                    color: 0x666666,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+                glow.position.copy(mesh.position);
+                scene.add(glow);
+                mesh.userData.glow = glow;
+            }
+        }
+
+        function animate() {
+            if (!is3DView) return;
+            
+            requestAnimationFrame(animate);
+            
+            // Update controls
+            controls.update();
+            
+            // Animate floating background elements
+            if (scene.userData.floatingElements) {
+                const time = Date.now() * 0.001;
+                scene.userData.floatingElements.forEach((element, index) => {
+                    const offset = element.userData.animationOffset;
+                    const originalPos = element.userData.originalPosition;
+                    
+                    // Gentle floating motion
+                    element.position.y = originalPos.y + Math.sin(time + offset) * 0.5;
+                    element.position.x = originalPos.x + Math.cos(time * 0.5 + offset) * 0.3;
+                    
+                    // Subtle rotation
+                    element.rotation.y += 0.01;
+                    element.rotation.x += 0.005;
+                });
+            }
+            
+            // Modern node animations
+            familyNodes.forEach((node, index) => {
+                if (node.userData.originalY !== undefined) {
+                    const time = Date.now() * 0.001;
+                    const offset = node.userData.animationOffset;
+                    const pulsePhase = node.userData.pulsePhase;
+                    
+                    // Smooth floating animation
+                    node.position.y = node.userData.originalY + Math.sin(time + offset) * 0.15;
+                    
+                    // Modern pulsing effect
+                    const pulseScale = 1 + Math.sin(time * 1.5 + pulsePhase) * 0.03;
+                    node.scale.setScalar(pulseScale);
+                    
+                    // Smooth rotation
+                    node.rotation.y += node.userData.rotationSpeed;
+                }
+            });
+            
+            renderer.render(scene, camera);
+        }
+
+        // Handle window resize for 3D view
+        window.addEventListener('resize', () => {
+            if (is3DView && camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+            
+
+        });
+
+        // 3D Click Detection and Interaction
+        function on3DClick(event) {
+            if (!is3DView) return;
+
+            // Calculate mouse position in normalized device coordinates
+            const mouse = new THREE.Vector2();
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            // Raycasting
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(mouse, camera);
+
+            // Check for intersections with family nodes
+            const intersects = raycaster.intersectObjects(familyNodes);
+            
+            if (intersects.length > 0) {
+                const clickedNode = intersects[0].object;
+                const person = clickedNode.userData.person;
+                
+                // Highlight the clicked person
+                highlight3DPerson(clickedNode);
+                
+                // Show relationships
+                show3DRelationships(person.id);
+                
+                // Animate camera to focus on the person
+                focusOnPerson(clickedNode);
+            }
+        }
+
+        function highlight3DPerson(node) {
+            // Reset all nodes to original appearance
+            familyNodes.forEach(n => {
+                n.material.color.copy(n.userData.originalColor);
+                n.scale.copy(n.userData.originalScale);
+                if (n.userData.label) {
+                    n.userData.label.material.opacity = 1;
+                }
+            });
+
+            // Highlight clicked node
+            node.material.color.setHex(0xffd700); // Gold color for selected person
+            node.scale.setScalar(1.5);
+            if (node.userData.label) {
+                node.userData.label.material.opacity = 1.5;
+            }
+        }
+
+        function show3DRelationships(personId) {
+            // Clear previous relationship lines
+            scene.children = scene.children.filter(child => 
+                child.type !== 'Line' && child.type !== 'LineSegments'
+            );
+
+            // Find relationships for this person
+            const relationships = familyData.relationships.filter(rel => 
+                rel.fromId === personId || rel.toId === personId
+            );
+
+            relationships.forEach(rel => {
+                const fromNode = familyNodes.find(n => n.userData.person.id === rel.fromId);
+                const toNode = familyNodes.find(n => n.userData.person.id === rel.toId);
+                
+                if (fromNode && toNode) {
+                    // Create relationship line
+                    const geometry = new THREE.BufferGeometry().setFromPoints([
+                        fromNode.position,
+                        toNode.position
+                    ]);
+                    
+                    const material = new THREE.LineBasicMaterial({ 
+                        color: 0xffd700, 
+                        linewidth: 3,
+                        transparent: true,
+                        opacity: 0.8
+                    });
+                    
+                    const line = new THREE.Line(geometry, material);
+                    scene.add(line);
+
+                    // Highlight related nodes with existing color scheme
+                    if (fromNode.userData.person.id !== personId) {
+                        // Use the person's original gender color but brighter
+                        const person = fromNode.userData.person;
+                        const highlightColor = person.gender === 'M' ? 0x63b3ed : 0xf687b3; // Brighter blue/pink
+                        fromNode.material.color.setHex(highlightColor);
+                        fromNode.scale.setScalar(1.2);
+                    }
+                    if (toNode.userData.person.id !== personId) {
+                        // Use the person's original gender color but brighter
+                        const person = toNode.userData.person;
+                        const highlightColor = person.gender === 'M' ? 0x63b3ed : 0xf687b3; // Brighter blue/pink
+                        toNode.material.color.setHex(highlightColor);
+                        toNode.scale.setScalar(1.2);
+                    }
+                }
+            });
+        }
+
+        function focusOnPerson(node) {
+            // Calculate target camera position
+            const targetPosition = node.position.clone();
+            targetPosition.y += 2;
+            targetPosition.z += 3;
+
+            // Animate camera movement
+            const startPosition = camera.position.clone();
+            const startTime = Date.now();
+            const duration = 1000; // 1 second
+
+            function animateCamera() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Smooth easing
+                const easeProgress = 1 - Math.pow(1 - progress, 3);
+                
+                camera.position.lerpVectors(startPosition, targetPosition, easeProgress);
+                camera.lookAt(node.position);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animateCamera);
+                }
+            }
+            
+            animateCamera();
+        }
+
+        // Add hover effects for better interactivity
+        function setup3DHoverEffects() {
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+
+            renderer.domElement.addEventListener('mousemove', (event) => {
+                if (!is3DView) return;
+
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(familyNodes);
+
+                // Reset cursor
+                renderer.domElement.style.cursor = 'default';
+
+                if (intersects.length > 0) {
+                    renderer.domElement.style.cursor = 'pointer';
+                    
+                    // Show tooltip
+                    const node = intersects[0].object;
+                    const person = node.userData.person;
+                    show3DTooltip(person.name, event.clientX, event.clientY);
+                } else {
+                    hide3DTooltip();
+                }
+            });
+        }
+
+        // Modern mobile gesture controls
+        function setupModernMobileControls() {
+            let touchStartX = 0;
+            let touchStartY = 0;
+            let touchStartTime = 0;
+            let isDoubleTap = false;
+            let lastTapTime = 0;
+
+            renderer.domElement.addEventListener('touchstart', (event) => {
+                if (event.touches.length === 1) {
+                    touchStartX = event.touches[0].clientX;
+                    touchStartY = event.touches[0].clientY;
+                    touchStartTime = Date.now();
+                    
+                    // Check for double tap
+                    const currentTime = Date.now();
+                    if (currentTime - lastTapTime < 300) {
+                        isDoubleTap = true;
+                        // Double tap to reset view
+                        resetCameraView();
+                    } else {
+                        isDoubleTap = false;
+                    }
+                    lastTapTime = currentTime;
+                }
+            }, { passive: true });
+
+            renderer.domElement.addEventListener('touchend', (event) => {
+                if (event.touches.length === 0 && !isDoubleTap) {
+                    const touchEndX = event.changedTouches[0].clientX;
+                    const touchEndY = event.changedTouches[0].clientY;
+                    const touchEndTime = Date.now();
+                    
+                    const deltaX = touchEndX - touchStartX;
+                    const deltaY = touchEndY - touchStartY;
+                    const deltaTime = touchEndTime - touchStartTime;
+                    
+                    // Modern swipe detection
+                    if (deltaTime < 400 && Math.abs(deltaX) > 40) {
+                        if (deltaX > 0) {
+                            // Swipe right - rotate right
+                            rotateCamera('right');
+                        } else {
+                            // Swipe left - rotate left
+                            rotateCamera('left');
+                        }
+                    }
+                }
+            }, { passive: true });
+        }
+
+        // Modern camera control functions
+        function resetCameraView() {
+            const targetPosition = new THREE.Vector3(0, 8, 15);
+            const startPosition = camera.position.clone();
+            const startTime = Date.now();
+            const duration = 800; // Faster reset
+
+            function animateReset() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeProgress = 1 - Math.pow(1 - progress, 4); // Smoother easing
+                
+                camera.position.lerpVectors(startPosition, targetPosition, easeProgress);
+                camera.lookAt(new THREE.Vector3(0, 0, 0));
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animateReset);
+                }
+            }
+            
+            animateReset();
+        }
+
+        function rotateCamera(direction) {
+            const rotationAmount = direction === 'right' ? -0.6 : 0.6;
+            const targetRotation = camera.rotation.y + rotationAmount;
+            const startRotation = camera.rotation.y;
+            const startTime = Date.now();
+            const duration = 400; // Faster rotation
+
+            function animateRotation() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeProgress = 1 - Math.pow(1 - progress, 3);
+                
+                camera.rotation.y = startRotation + (targetRotation - startRotation) * easeProgress;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animateRotation);
+                }
+            }
+            
+            animateRotation();
+        }
+
+        function show3DTooltip(name, x, y) {
+            let tooltip = document.getElementById('3d-tooltip');
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.id = '3d-tooltip';
+                tooltip.style.cssText = `
+                    position: fixed;
+                    background: rgba(0, 0, 0, 0.8);
+                    color: white;
+                    padding: 8px 12px;
+                    border-radius: 6px;
+                    font-size: 14px;
+                    pointer-events: none;
+                    z-index: 10000;
+                    display: none;
+                `;
+                document.body.appendChild(tooltip);
+            }
+            
+            tooltip.textContent = name;
+            tooltip.style.left = (x + 10) + 'px';
+            tooltip.style.top = (y - 10) + 'px';
+            tooltip.style.display = 'block';
+        }
+
+        function hide3DTooltip() {
+            const tooltip = document.getElementById('3d-tooltip');
+            if (tooltip) {
+                tooltip.style.display = 'none';
+            }
+        }
+
+        function clear3DRelationships() {
+            if (scene) {
+                // Remove all relationship lines
+                scene.children = scene.children.filter(child => 
+                    child.type !== 'Line' && child.type !== 'LineSegments'
+                );
+                
+                // Reset all nodes to original appearance
+                familyNodes.forEach(node => {
+                    if (node.material && node.userData.originalColor) {
+                        node.material.color.copy(node.userData.originalColor);
+                        node.scale.copy(node.userData.originalScale);
+                    }
+                });
+            }
+        }
+
+
+
+
 
         function centerView() {
             document.querySelector('.tree-wrapper').scrollIntoView({ 
@@ -794,34 +3224,148 @@
             });
         }
 
-        function printView() {
-            window.print();
-        }
 
-        function shareTree() {
-            // Try to use native sharing if available
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Igisekuru - Family Tree',
-                    text: 'Check out our family tree!',
-                    url: window.location.href
-                });
-            } else {
-                // Fallback: copy link to clipboard
-                navigator.clipboard.writeText(window.location.href).then(() => {
-                    alert('Link copied to clipboard! Share this link with your family.');
-                }).catch(() => {
-                    // If clipboard fails, show the URL
-                    prompt('Copy this link to share with your family:', window.location.href);
-                });
-            }
-        }
+
+
 
         // Initialize the application
+        function initializeApp() {
+            try {
         initializeData();
+                validateFamilyData();
         buildGenerationStructure();
         renderFamilyTree();
         setupSearch();
+        setupMobileToggle();
+        setupOfflineSupport();
+        
+                // Add mobile-specific event listeners
+                if (window.innerWidth <= 768) {
+                    setupMobileEvents();
+                }
+                
+                // Handle orientation change
+                window.addEventListener('orientationchange', () => {
+                    setTimeout(() => {
+                        if (window.innerWidth <= 768) {
+                            setupMobileEvents();
+                        }
+                        // Recalculate positions after orientation change
+                        if (is3DView && camera && renderer) {
+                            camera.aspect = window.innerWidth / window.innerHeight;
+                            camera.updateProjectionMatrix();
+                            renderer.setSize(window.innerWidth, window.innerHeight);
+                        }
+                    }, 100);
+                });
+                
+            } catch (error) {
+                console.error('Error initializing application:', error);
+                // Fallback initialization
+                document.body.innerHTML = '<div style="padding: 20px; text-align: center; color: white;">Error loading family tree. Please refresh the page.</div>';
+            }
+        }
+
+        function setupMobileEvents() {
+            // Prevent zoom on double tap
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', (event) => {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+
+            // Better touch handling for person cards - don't prevent default to allow highlighting
+            document.querySelectorAll('.person-card').forEach(card => {
+                card.addEventListener('touchstart', (e) => {
+                    // Don't prevent default - let the click event work for highlighting
+                    card.style.transform = 'scale(0.98)';
+                });
+
+                card.addEventListener('touchend', (e) => {
+                    // Don't prevent default - let the click event work for highlighting
+                    card.style.transform = 'scale(1)';
+                });
+            });
+        }
+
+        // Start the application when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+
+
+
+
+
+        function validateFamilyData() {
+            // Check for people not in any relationships
+            const peopleInRelationships = new Set();
+            familyData.relationships.forEach(rel => {
+                peopleInRelationships.add(rel.fromId);
+                peopleInRelationships.add(rel.toId);
+            });
+            
+            const disconnectedPeople = familyData.people.filter(p => !peopleInRelationships.has(p.id));
+            if (disconnectedPeople.length > 0) {
+                // Silently handle disconnected people
+            }
+            
+            // Check for orphaned relationships (people referenced but not defined)
+            const definedPeople = new Set(familyData.people.map(p => p.id));
+            const orphanedRelationships = familyData.relationships.filter(rel => 
+                !definedPeople.has(rel.fromId) || !definedPeople.has(rel.toId)
+            );
+            
+            if (orphanedRelationships.length > 0) {
+                // Silently handle orphaned relationships
+            }
+            
+            // Check for circular references
+            const visited = new Set();
+            const recursionStack = new Set();
+            
+            function hasCircularReference(personId) {
+                if (recursionStack.has(personId)) {
+                    return true;
+                }
+                if (visited.has(personId)) {
+                    return false;
+                }
+                
+                visited.add(personId);
+                recursionStack.add(personId);
+                
+                const children = familyData.relationships
+                    .filter(rel => rel.type === 'parent' && rel.fromId === personId)
+                    .map(rel => rel.toId);
+                
+                for (const childId of children) {
+                    if (hasCircularReference(childId)) {
+                        return true;
+                    }
+                }
+                
+                recursionStack.delete(personId);
+                return false;
+            }
+            
+            const roots = familyData.people.filter(p => 
+                !familyData.relationships.some(rel => 
+                    rel.type === 'parent' && rel.toId === p.id
+                )
+            );
+            
+            for (const root of roots) {
+                if (hasCircularReference(root.id)) {
+                    // Silently handle circular references
+                }
+            }
+        }
     </script>
 </body>
 </html>
