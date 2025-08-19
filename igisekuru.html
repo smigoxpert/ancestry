@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Tree - Vertical Layout</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Trebuchet MS', Arial, sans-serif;
+            background: radial-gradient(circle at center, #1a365d 0%, #2d3748 50%, #1a202c 100%);
+            min-height: 100vh;
+            color: #f7fafc;
+            overflow-x: auto;
+        }
+
+        .main-container {
+            width: 100vw;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: sticky;
+            top: 0;
+            background: rgba(26, 54, 93, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #ffd700;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            color: #e2e8f0;
+            font-style: italic;
+        }
+
+        .tree-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            min-width: fit-content;
+            padding: 40px 20px;
+        }
+
+        .generation {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 40px 0;
+            position: relative;
+            width: 100%;
+            gap: 30px;
+        }
+
+        .generation::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+        }
+
+        .person-card {
+            background: linear-gradient(145deg, #2d3748, #4a5568);
+            border: 2px solid #718096;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            min-width: 200px;
+            max-width: 280px;
+            text-align: center;
+        }
+
+        .person-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 50px rgba(255, 215, 0, 0.3);
+            border-color: #ffd700;
+        }
+
+        .person-card.male {
+            border-color: #4299e1;
+            background: linear-gradient(145deg, #2c5282, #3182ce);
+        }
+
+        .person-card.male:hover {
+            border-color: #63b3ed;
+            box-shadow: 0 20px 50px rgba(66, 153, 225, 0.4);
+        }
+
+        .person-card.female {
+            border-color: #ed64a6;
+            background: linear-gradient(145deg, #b83280, #d53f8c);
+        }
+
+        .person-card.female:hover {
+            border-color: #f687b3;
+            box-shadow: 0 20px 50px rgba(237, 100, 166, 0.4);
+        }
+
+        .person-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #f7fafc;
+            margin-bottom: 8px;
+            line-height: 1.3;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            word-wrap: break-word;
+        }
+
+        .person-gender {
+            font-size: 0.9em;
+            color: #cbd5e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .generation-label {
+            position: absolute;
+            left: -150px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 215, 0, 0.1);
+            color: #ffd700;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 0.9em;
+            border: 1px solid #ffd700;
+            white-space: nowrap;
+        }
+
+        .connection-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .connection-line {
+            position: absolute;
+            background: #ffd700;
+            opacity: 0.6;
+        }
+
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(45, 55, 72, 0.95);
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid #718096;
+            z-index: 1000;
+        }
+
+        .controls button {
+            background: linear-gradient(145deg, #4a5568, #2d3748);
+            color: #f7fafc;
+            border: 1px solid #718096;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 3px;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .controls button:hover {
+            background: linear-gradient(145deg, #718096, #4a5568);
+            border-color: #ffd700;
+            transform: translateY(-2px);
+        }
+
+        .statistics {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(45, 55, 72, 0.95);
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid #718096;
+            z-index: 1000;
+            min-width: 200px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            color: #e2e8f0;
+            font-size: 0.9em;
+        }
+
+        .stat-value {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .search-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+
+        .search-input {
+            padding: 10px 15px;
+            border: 2px solid #4a5568;
+            border-radius: 25px;
+            background: rgba(45, 55, 72, 0.95);
+            color: #f7fafc;
+            font-size: 1em;
+            width: 300px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .search-input::placeholder {
+            color: #a0aec0;
+        }
+
+        .legend {
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            background: rgba(45, 55, 72, 0.95);
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid #718096;
+            z-index: 1000;
+            min-width: 180px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            color: #e2e8f0;
+            font-size: 0.9em;
+        }
+
+        .legend-icon {
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .legend-icon.male {
+            background: rgba(66, 153, 225, 0.2);
+            border: 1px solid #4299e1;
+        }
+
+        .legend-icon.female {
+            background: rgba(237, 100, 166, 0.2);
+            border: 1px solid #ed64a6;
+        }
+
+        .legend-icon.missing {
+            background: rgba(160, 174, 192, 0.2);
+            border: 1px dashed #a0aec0;
+        }
+
+        .legend-icon.spouse {
+            background: rgba(237, 137, 54, 0.2);
+            border: 1px solid #ed8936;
+        }
+
+        .person-card.highlighted {
+            border-color: #ffd700 !important;
+            background: linear-gradient(145deg, #744210, #975a16) !important;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6) !important;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); }
+            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.8); }
+            100% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); }
+        }
+
+        .spouse-indicator {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #ed8936;
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            border: 2px solid #2d3748;
+        }
+
+        /* Missing Person Styles */
+        .person-card.missing-person {
+            background: linear-gradient(145deg, #4a5568, #2d3748);
+            border: 2px dashed #a0aec0;
+            border-radius: 20px;
+            position: relative;
+            opacity: 0.8;
+        }
+
+        .person-card.missing-person:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(160, 174, 192, 0.4);
+            border-color: #cbd5e0;
+            opacity: 1;
+        }
+
+        .person-card.missing-person::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: linear-gradient(45deg, transparent, rgba(160, 174, 192, 0.1), transparent);
+            border-radius: 25px;
+            z-index: -1;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .missing-name {
+            color: #a0aec0 !important;
+            font-style: italic;
+        }
+
+        .missing-gender {
+            color: #718096 !important;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .missing-icon {
+            font-size: 1.5em;
+            opacity: 0.7;
+        }
+
+        .missing-text {
+            font-size: 0.8em;
+            font-style: italic;
+        }
+
+        .missing-notes {
+            font-size: 0.8em;
+            color: #a0aec0;
+            font-style: italic;
+            margin-top: 8px;
+            padding: 5px;
+            background: rgba(160, 174, 192, 0.1);
+            border-radius: 8px;
+            border-left: 3px solid #a0aec0;
+        }
+
+        @media (max-width: 768px) {
+            .generation-label {
+                position: relative;
+                left: 0;
+                transform: none;
+                margin-bottom: 20px;
+                display: block;
+                text-align: center;
+            }
+
+            .search-input {
+                width: 250px;
+            }
+
+            .person-card {
+                min-width: 180px;
+                max-width: 220px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <h1>🌲 Igisekuru</h1>
+            <p>Celebrating our family's legacy through generations</p>
+        </div>
+
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="🔍 Search family members..." id="searchInput">
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-icon male">👨🏾</div>
+                <span>Male</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon female">👧🏾</div>
+                <span>Female</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon missing">❓</div>
+                <span>Unknown/Missing</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon spouse">💑</div>
+                <span>Married</span>
+            </div>
+        </div>
+
+        <div class="tree-wrapper" id="treeWrapper">
+            <!-- Family tree will be rendered here -->
+        </div>
+    </div>
+
+            <div class="controls">
+            <button onclick="expandAll()">📖 Expand All</button>
+            <button onclick="collapseAll()">📋 Collapse</button>
+            <button onclick="centerView()">🎯 Center</button>
+            <button onclick="printView()">🖨️ Print</button>
+            <button onclick="shareTree()">📤 Share</button>
+        </div>
+
+    <div class="statistics" id="statistics">
+        <!-- Statistics will be populated here -->
+    </div>
+
+    <script>
+        const familyData = {
+            "people": [
+                { "id": "gahenda", "name": "Gahenda (Umwega)", "gender": "M" },
+                { "id": "mitunga", "name": "Mitunga (Umunyiginya kazi)", "gender": "F" },
+                { "id": "ndahiriwe", "name": "Ndahiriwe", "gender": "M" },
+                { "id": "rutembya", "name": "Rutembya", "gender": "M" },
+                { "id": "kanyandinzi", "name": "Kanyandinzi", "gender": "M" },
+                { "id": "rudahunikira", "name": "Rudahunikira", "gender": "M", "notes": "Father unknown, grandfather is Kanyandinzi" },
+                { "id": "ntabgoba", "name": "Ntabgoba", "gender": "M" },
+                { "id": "ngoga", "name": "Ngoga", "gender": "M" },
+                { "id": "kanyarukiga", "name": "Kanyarukiga", "gender": "M" },
+                { "id": "bugegera", "name": "Bugegera Sylvestre", "gender": "M" },
+                { "id": "ruhurambuga", "name": "Ruhurambuga", "gender": "M" },
+                { "id": "karambizi", "name": "Karambizi Thomas", "gender": "M" },
+                { "id": "kayonga", "name": "Kayonga Petero", "gender": "M" },
+                { "id": "sagahutu", "name": "Sagahutu Godfiridi", "gender": "M" },
+                { "id": "rwabiza", "name": "Rwabiza Karoli", "gender": "M" },
+                { "id": "nyiranziga", "name": "Nyiranziga Costazie", "gender": "F" },
+                { "id": "kamugundu", "name": "Kamugundu Theodor", "gender": "M" },
+                { "id": "nyarasoni", "name": "Nyarasoni Perepetua", "gender": "F" },
+                { "id": "kansanga", "name": "Kansanga Feresta", "gender": "F" },
+                { "id": "jaribu", "name": "Jaribu Gonzarive", "gender": "M" },
+                { "id": "rutagambwa", "name": "Rutagambwa Jean Baptist", "gender": "M" },
+                { "id": "duzabemaliya", "name": "Duzabemaliya Epiphanie", "gender": "F" },
+                { "id": "uwizera", "name": "Uwizera Sarah", "gender": "F" },
+                { "id": "iyakaremye", "name": "Iyakaremye Fidele", "gender": "M" },
+                { "id": "karenganganizi", "name": "Karenganganizi Celestin", "gender": "M" },
+                { "id": "gakunde", "name": "Gakunde Alexis", "gender": "M" },
+                { "id": "gakaka_alphonse", "name": "Gakaka Alphonse", "gender": "M" },
+                { "id": "ngarambe", "name": "Ngarambe Isidori", "gender": "M" },
+                { "id": "kayinamura", "name": "Kayinamura Anicet", "gender": "M" },
+                { "id": "numukobwa", "name": "Numukobwa Lawrencia", "gender": "F" },
+                { "id": "kanote", "name": "Kanote Stellia", "gender": "F" },
+                { "id": "mukahigiro", "name": "Mukahigiro Feresta", "gender": "F" },
+                { "id": "karemangingo", "name": "Karemangingo Adirien", "gender": "M" },
+                { "id": "mukamunana", "name": "Mukamunana", "gender": "F" },
+                { "id": "mukabadege", "name": "Mukabadege", "gender": "F" },
+                { "id": "mukandutiye", "name": "Mukandutiye Saverine", "gender": "F" },
+                { "id": "mukandinda", "name": "Mukandinda Venancie", "gender": "F" },
+                { "id": "munyakana", "name": "Munyakana Leoncie", "gender": "F" },
+                { "id": "makuza", "name": "Makuza Alexandre", "gender": "M" },
+                { "id": "gakaka_bosco", "name": "Gakaka Bosco", "gender": "M" },
+                { "id": "nkusi", "name": "Nkusi Heriman", "gender": "M" },
+                { "id": "mukabideri", "name": "Mukabideri Belancilla", "gender": "F" },
+                { "id": "mukandimbira", "name": "Mukandimbira Dancilla", "gender": "F" },
+                { "id": "unknown_father", "name": "Unknown Forefather", "gender": "M", "isMissing": true, "notes": "Father of Rudahunikira. Name lost to history." }
+            ],
+            "relationships": [
+                { "type": "spouse", "fromId": "gahenda", "toId": "mitunga" },
+                { "type": "parent", "fromId": "gahenda", "toId": "ndahiriwe" },
+                { "type": "parent", "fromId": "mitunga", "toId": "ndahiriwe" },
+                { "type": "parent", "fromId": "ndahiriwe", "toId": "rutembya" },
+                { "type": "parent", "fromId": "rutembya", "toId": "ruhurambuga" },
+                { "type": "parent", "fromId": "rutembya", "toId": "kanyandinzi" },
+                { "type": "parent", "fromId": "kanyandinzi", "toId": "unknown_father" },
+                { "type": "parent", "fromId": "unknown_father", "toId": "rudahunikira" },
+                { "type": "parent", "fromId": "rudahunikira", "toId": "ntabgoba" },
+                { "type": "parent", "fromId": "ntabgoba", "toId": "ngoga" },
+                { "type": "parent", "fromId": "ngoga", "toId": "karambizi" },
+                { "type": "parent", "fromId": "ngoga", "toId": "kayonga" },
+                { "type": "parent", "fromId": "ngoga", "toId": "kanyarukiga" },
+                { "type": "parent", "fromId": "ngoga", "toId": "sagahutu" },
+                { "type": "parent", "fromId": "ngoga", "toId": "rwabiza" },
+                { "type": "parent", "fromId": "kanyarukiga", "toId": "nyiranziga" },
+                { "type": "parent", "fromId": "kanyarukiga", "toId": "kamugundu" },
+                { "type": "parent", "fromId": "kanyarukiga", "toId": "bugegera" },
+                { "type": "parent", "fromId": "kanyarukiga", "toId": "nyarasoni" },
+                { "type": "parent", "fromId": "kanyarukiga", "toId": "kansanga" },
+                { "type": "parent", "fromId": "bugegera", "toId": "jaribu" },
+                { "type": "parent", "fromId": "bugegera", "toId": "rutagambwa" },
+                { "type": "parent", "fromId": "bugegera", "toId": "duzabemaliya" },
+                { "type": "parent", "fromId": "bugegera", "toId": "uwizera" },
+                { "type": "parent", "fromId": "kayonga", "toId": "iyakaremye" },
+                { "type": "parent", "fromId": "kayonga", "toId": "karenganganizi" },
+                { "type": "parent", "fromId": "kayonga", "toId": "gakunde" },
+                { "type": "parent", "fromId": "kayonga", "toId": "gakaka_alphonse" },
+                { "type": "parent", "fromId": "karambizi", "toId": "ngarambe" },
+                { "type": "parent", "fromId": "karambizi", "toId": "kayinamura" },
+                { "type": "parent", "fromId": "karambizi", "toId": "numukobwa" },
+                { "type": "parent", "fromId": "karambizi", "toId": "kanote" },
+                { "type": "parent", "fromId": "karambizi", "toId": "mukahigiro" },
+                { "type": "parent", "fromId": "karambizi", "toId": "karemangingo" },
+                { "type": "parent", "fromId": "karambizi", "toId": "mukamunana" },
+                { "type": "parent", "fromId": "karambizi", "toId": "mukabadege" },
+                { "type": "parent", "fromId": "karambizi", "toId": "mukandutiye" },
+                { "type": "parent", "fromId": "rwabiza", "toId": "mukandinda" },
+                { "type": "parent", "fromId": "rwabiza", "toId": "munyakana" },
+                { "type": "parent", "fromId": "rwabiza", "toId": "makuza" },
+                { "type": "parent", "fromId": "rwabiza", "toId": "gakaka_bosco" },
+                { "type": "parent", "fromId": "rwabiza", "toId": "nkusi" },
+                { "type": "parent", "fromId": "rwabiza", "toId": "mukabideri" },
+                { "type": "parent", "fromId": "rwabiza", "toId": "mukandimbira" }
+            ]
+        };
+
+        let generationStructure = {};
+        let peopleMap = {};
+        let spouses = new Set();
+
+        function initializeData() {
+            // Create people map
+            familyData.people.forEach(person => {
+                peopleMap[person.id] = person;
+            });
+
+            // Identify spouses
+            familyData.relationships.forEach(rel => {
+                if (rel.type === 'spouse') {
+                    spouses.add(rel.fromId);
+                    spouses.add(rel.toId);
+                }
+            });
+        }
+
+        function buildGenerationStructure() {
+            generationStructure = {};
+            
+            function assignGeneration(personId, generation) {
+                if (!generationStructure[generation]) {
+                    generationStructure[generation] = [];
+                }
+                
+                if (!generationStructure[generation].includes(personId)) {
+                    generationStructure[generation].push(personId);
+                    
+                    // Find children and assign them to next generation
+                    familyData.relationships.forEach(rel => {
+                        if (rel.type === 'parent' && rel.fromId === personId) {
+                            assignGeneration(rel.toId, generation + 1);
+                        }
+                    });
+                }
+            }
+
+            // Find root ancestors (people who are not children of anyone)
+            const children = new Set(familyData.relationships.filter(r => r.type === 'parent').map(r => r.toId));
+            const roots = familyData.people.filter(p => !children.has(p.id));
+            
+            roots.forEach(root => assignGeneration(root.id, 0));
+        }
+
+        function createPersonCard(person) {
+            const card = document.createElement('div');
+            card.className = `person-card ${person.gender === 'M' ? 'male' : 'female'}`;
+            if (person.isMissing) {
+                card.classList.add('missing-person');
+            }
+            card.dataset.personId = person.id;
+            
+            const isSpouse = spouses.has(person.id);
+            
+            if (person.isMissing) {
+                card.innerHTML = `
+                    <div class="person-name missing-name">${person.name}</div>
+                    <div class="person-gender missing-gender">
+                        <span class="missing-icon">❓</span>
+                        <span class="missing-text">Unknown</span>
+                    </div>
+                    <div class="missing-notes">${person.notes || 'Information lost to history'}</div>
+                    ${isSpouse ? '<div class="spouse-indicator">💑</div>' : ''}
+                `;
+            } else {
+                card.innerHTML = `
+                    <div class="person-name">${person.name}</div>
+                    <div class="person-gender">
+                        ${person.gender === 'M' ? '👨‍💼' : '👩‍💼'}
+                        ${person.gender === 'M' ? 'Male' : 'Female'}
+                    </div>
+                    ${isSpouse ? '<div class="spouse-indicator">💑</div>' : ''}
+                `;
+            }
+
+            card.addEventListener('click', () => highlightRelatives(person.id));
+            
+            return card;
+        }
+
+        function renderFamilyTree() {
+            const wrapper = document.getElementById('treeWrapper');
+            wrapper.innerHTML = '';
+
+            const generations = Object.keys(generationStructure).sort((a, b) => parseInt(a) - parseInt(b));
+            
+            generations.forEach(genKey => {
+                const generation = document.createElement('div');
+                generation.className = 'generation';
+                
+                const label = document.createElement('div');
+                label.className = 'generation-label';
+                label.textContent = `Generation ${parseInt(genKey) + 1}`;
+                generation.appendChild(label);
+
+                const people = generationStructure[genKey];
+                people.forEach(personId => {
+                    if (peopleMap[personId]) {
+                        const card = createPersonCard(peopleMap[personId]);
+                        generation.appendChild(card);
+                    } else {
+                        // Create a placeholder for missing people
+                        const placeholderCard = createMissingPersonCard(personId);
+                        generation.appendChild(placeholderCard);
+                    }
+                });
+
+                wrapper.appendChild(generation);
+            });
+
+            updateStatistics();
+        }
+
+        function createMissingPersonCard(personId) {
+            const card = document.createElement('div');
+            card.className = 'person-card missing-person';
+            card.dataset.personId = personId;
+            
+            card.innerHTML = `
+                <div class="person-name missing-name">Unknown Ancestor</div>
+                <div class="person-gender missing-gender">
+                    <span class="missing-icon">❓</span>
+                    <span class="missing-text">Unknown</span>
+                </div>
+                <div class="missing-notes">Information about this ancestor has been lost to history</div>
+            `;
+
+            card.addEventListener('click', () => highlightRelatives(personId));
+            
+            return card;
+        }
+
+        function updateStatistics() {
+            const stats = document.getElementById('statistics');
+            const totalPeople = familyData.people.length;
+            const maleCount = familyData.people.filter(p => p.gender === 'M').length;
+            const femaleCount = familyData.people.filter(p => p.gender === 'F').length;
+            const generations = Object.keys(generationStructure).length;
+
+            stats.innerHTML = `
+                <div class="stat-item">
+                    <span>Total Members:</span>
+                    <span class="stat-value">${totalPeople}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Males:</span>
+                    <span class="stat-value">${maleCount}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Females:</span>
+                    <span class="stat-value">${femaleCount}</span>
+                </div>
+                <div class="stat-item">
+                    <span>Generations:</span>
+                    <span class="stat-value">${generations}</span>
+                </div>
+            `;
+        }
+
+        function highlightRelatives(personId) {
+            // Clear previous highlights
+            document.querySelectorAll('.person-card').forEach(card => {
+                card.classList.remove('highlighted');
+            });
+
+            // Highlight the selected person
+            const selectedCard = document.querySelector(`[data-person-id="${personId}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('highlighted');
+            }
+
+            // Find and highlight relatives
+            const relatives = new Set();
+            
+            familyData.relationships.forEach(rel => {
+                if (rel.fromId === personId) {
+                    relatives.add(rel.toId);
+                }
+                if (rel.toId === personId) {
+                    relatives.add(rel.fromId);
+                }
+            });
+
+            relatives.forEach(relativeId => {
+                const card = document.querySelector(`[data-person-id="${relativeId}"]`);
+                if (card) {
+                    card.classList.add('highlighted');
+                }
+            });
+        }
+
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                
+                document.querySelectorAll('.person-card').forEach(card => {
+                    const name = card.querySelector('.person-name').textContent.toLowerCase();
+                    if (query && name.includes(query)) {
+                        card.classList.add('highlighted');
+                    } else {
+                        card.classList.remove('highlighted');
+                    }
+                });
+            });
+        }
+
+        function expandAll() {
+            document.querySelectorAll('.generation').forEach(gen => {
+                gen.style.display = 'flex';
+            });
+        }
+
+        function collapseAll() {
+            document.querySelectorAll('.generation').forEach((gen, index) => {
+                if (index > 0) {
+                    gen.style.display = 'none';
+                }
+            });
+        }
+
+        function centerView() {
+            document.querySelector('.tree-wrapper').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+        }
+
+        function printView() {
+            window.print();
+        }
+
+        function shareTree() {
+            // Try to use native sharing if available
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Igisekuru - Family Tree',
+                    text: 'Check out our family tree!',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback: copy link to clipboard
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    alert('Link copied to clipboard! Share this link with your family.');
+                }).catch(() => {
+                    // If clipboard fails, show the URL
+                    prompt('Copy this link to share with your family:', window.location.href);
+                });
+            }
+        }
+
+        // Initialize the application
+        initializeData();
+        buildGenerationStructure();
+        renderFamilyTree();
+        setupSearch();
+    </script>
+</body>
+</html>
