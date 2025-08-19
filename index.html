@@ -1874,29 +1874,26 @@
         </div>
     </div>
 
-            <div class="controls" id="controls">
-            <button onclick="centerView()">🎯 Center</button>
-            <button onclick="toggle3DView()">🌐 3D View</button>
-        </div>
-
-
+    <div class="controls" id="controls">
+        <button onclick="centerView()">🎯 Center</button>
+        <button onclick="toggle3DView()">🌐 3D View</button>
+    </div>
 
     <div class="back-to-2d" id="backTo2D" onclick="exit3DView()">
         ← Back to 2D View
     </div>
     
 
-
-         <div class="three-d-instructions" id="threeDInstructions">
-          <h4>🎮 3D Navigation</h4>
-          <ul>
-              <li><strong>Mouse:</strong> Click & drag to rotate</li>
-              <li><strong>Scroll:</strong> Zoom in/out</li>
-              <li><strong>Click:</strong> Select family member</li>
-              <li><strong>Double-click:</strong> Focus on person</li>
-              <li><strong>Colors:</strong> Blue = Male, Pink = Female</li>
-          </ul>
-      </div>
+    <div class="three-d-instructions" id="threeDInstructions">
+        <h4>🎮 3D Navigation</h4>
+        <ul>
+            <li><strong>Mouse:</strong> Click & drag to rotate</li>
+            <li><strong>Scroll:</strong> Zoom in/out</li>
+            <li><strong>Click:</strong> Select family member</li>
+            <li><strong>Double-click:</strong> Focus on person</li>
+            <li><strong>Colors:</strong> Blue = Male, Pink = Female</li>
+        </ul>
+    </div>
 
     <div class="statistics" id="statistics">
         <!-- Statistics will be populated here -->
@@ -1928,7 +1925,18 @@
                 { "id": "rutagambwa", "name": "Rutagambwa Jean Baptist", "gender": "M" },
                 { "id": "duzabemaliya", "name": "Duzabemaliya Epiphanie", "gender": "F" },
                 { "id": "uwizera", "name": "Uwizera Sarah", "gender": "F" },
-                { "id": "iyakaremye", "name": "Iyakaremye Fidele", "gender": "M" },
+                { "id": "iyamuremye", "name": "Iyamuremye Fidele", "gender": "M" },
+                { "id": "nkaka_jean_pierre", "name": "Nkaka Jean Pierre", "gender": "M" },
+                { "id": "nkaka_annociata", "name": "Nkaka Annociata", "gender": "F" },
+                { "id": "mukankusi_odette", "name": "Mukankusi Odette", "gender": "F" },
+                { "id": "mukankubito_alphonsine", "name": "Mukankubito Alphonsine", "gender": "F" },
+                { "id": "dusabe_m_chantal", "name": "Dusabe M Chantal", "gender": "F" },
+                { "id": "uwera_evelyne", "name": "Uwera Evelyne", "gender": "F" },
+                { "id": "uwase", "name": "Uwase", "gender": "F" },
+                { "id": "mutoni", "name": "Mutoni", "gender": "F" },
+                { "id": "cyubahiro", "name": "Cyubahiro", "gender": "M" },
+                { "id": "alice", "name": "Alice", "gender": "F" },
+                { "id": "mimi", "name": "Mimi", "gender": "F" },
                 { "id": "karenganganizi", "name": "Karenganganizi Celestin", "gender": "M" },
                 { "id": "gakunde", "name": "Gakunde Alexis", "gender": "M" },
                 { "id": "gakaka_alphonse", "name": "Gakaka Alphonse", "gender": "M" },
@@ -1979,7 +1987,7 @@
                 { "type": "parent", "fromId": "bugegera", "toId": "rutagambwa" },
                 { "type": "parent", "fromId": "bugegera", "toId": "duzabemaliya" },
                 { "type": "parent", "fromId": "bugegera", "toId": "uwizera" },
-                { "type": "parent", "fromId": "kayonga", "toId": "iyakaremye" },
+                { "type": "parent", "fromId": "kayonga", "toId": "iyamuremye" },
                 { "type": "parent", "fromId": "kayonga", "toId": "karenganganizi" },
                 { "type": "parent", "fromId": "kayonga", "toId": "gakunde" },
                 { "type": "parent", "fromId": "kayonga", "toId": "gakaka_alphonse" },
@@ -1999,7 +2007,18 @@
                 { "type": "parent", "fromId": "rwabiza", "toId": "nkusi" },
                 { "type": "parent", "fromId": "rwabiza", "toId": "mukabideri" },
                 { "type": "parent", "fromId": "rwabiza", "toId": "mukandimbira" },
-                { "type": "parent", "fromId": "iyakaremye", "toId": "alfred_hitayezu" },
+                { "type": "parent", "fromId": "iyamuremye", "toId": "alfred_hitayezu" },
+                { "type": "parent", "fromId": "iyamuremye", "toId": "nkaka_jean_pierre" },
+                { "type": "parent", "fromId": "iyamuremye", "toId": "nkaka_annociata" },
+                { "type": "parent", "fromId": "iyamuremye", "toId": "mukankusi_odette" },
+                { "type": "parent", "fromId": "iyamuremye", "toId": "mukankubito_alphonsine" },
+                { "type": "parent", "fromId": "iyamuremye", "toId": "dusabe_m_chantal" },
+                { "type": "parent", "fromId": "iyamuremye", "toId": "uwera_evelyne" },
+                { "type": "parent", "fromId": "nkaka_jean_pierre", "toId": "uwase" },
+                { "type": "parent", "fromId": "nkaka_jean_pierre", "toId": "mutoni" },
+                { "type": "parent", "fromId": "nkaka_annociata", "toId": "cyubahiro" },
+                { "type": "parent", "fromId": "mukankusi_odette", "toId": "alice" },
+                { "type": "parent", "fromId": "mukankubito_alphonsine", "toId": "mimi" },
                 { "type": "parent", "fromId": "alfred_hitayezu", "toId": "jean_de_dieu" },
                 { "type": "parent", "fromId": "alfred_hitayezu", "toId": "rama_smith" },
                 { "type": "parent", "fromId": "alfred_hitayezu", "toId": "urusaro_chelline_keilla" }
