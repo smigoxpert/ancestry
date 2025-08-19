@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Family Tree - Vertical Layout</title>
+    <title>Igisekuru - Family Tree</title>
     
     <!-- Three.js for 3D visualization -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -621,6 +621,169 @@
             50% { box-shadow: 0 0 40px rgba(66, 153, 225, 0.8); }
             100% { box-shadow: 0 0 30px rgba(66, 153, 225, 0.6); }
         }
+
+        /* Enhanced Search Status Styles */
+        .search-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(145deg, #2d3748, #4a5568);
+            border: 2px solid #4299e1;
+            border-radius: 15px;
+            padding: 20px;
+            color: #f7fafc;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            max-width: 350px;
+            transform: translateX(400px);
+            transition: transform 0.3s ease-in-out;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-status.visible {
+            transform: translateX(0);
+        }
+
+        .search-status-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .search-status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #4a5568;
+            padding-bottom: 8px;
+        }
+        
+        .search-status-close {
+            background: none;
+            border: none;
+            color: #a0aec0;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+        
+        .search-status-close:hover {
+            background: rgba(160, 174, 192, 0.2);
+            color: #e2e8f0;
+        }
+
+
+        /* Generation-based color coding */
+        .person-card[data-generation="0"] { border-color: #ff6b6b; }
+        .person-card[data-generation="1"] { border-color: #4ecdc4; }
+        .person-card[data-generation="2"] { border-color: #45b7d1; }
+        .person-card[data-generation="3"] { border-color: #96ceb4; }
+        .person-card[data-generation="4"] { border-color: #feca57; }
+        .person-card[data-generation="5"] { border-color: #ff9ff3; }
+
+        .search-status-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #4299e1;
+            border-bottom: 1px solid #4a5568;
+            padding-bottom: 8px;
+        }
+
+        .search-status-relationships {
+            font-size: 1em;
+            color: #e2e8f0;
+            line-height: 1.4;
+        }
+
+        .search-status-query {
+            font-size: 0.9em;
+            color: #a0aec0;
+            font-style: italic;
+            border-top: 1px solid #4a5568;
+            padding-top: 8px;
+        }
+
+        /* Mobile responsive search status */
+        @media (max-width: 768px) {
+            .search-status {
+                position: fixed;
+                top: 80px; /* Position below header/search area */
+                left: 10px;
+                right: 10px;
+                max-width: none;
+                width: auto;
+                transform: translateY(-100px);
+                z-index: 999; /* Ensure it's above other elements */
+                padding: 15px;
+                border-radius: 12px;
+                font-size: 0.9em;
+            }
+            
+            .search-status.visible {
+                transform: translateY(0);
+            }
+            
+            .search-status-header {
+                padding-bottom: 6px;
+            }
+            
+            .search-status-title {
+                font-size: 1.1em;
+            }
+            
+            .search-status-relationships {
+                font-size: 0.9em;
+                line-height: 1.3;
+            }
+            
+            .search-status-query {
+                font-size: 0.8em;
+                padding-top: 6px;
+            }
+        }
+        
+        /* Extra small mobile devices */
+        @media (max-width: 480px) {
+            .search-status {
+                top: 70px;
+                left: 8px;
+                right: 8px;
+                padding: 12px;
+                font-size: 0.85em;
+            }
+            
+            .search-status-header {
+                padding-bottom: 4px;
+            }
+            
+            .search-status-title {
+                font-size: 1em;
+            }
+            
+            .search-status-relationships {
+                font-size: 0.85em;
+            }
+            
+            .search-status-query {
+                font-size: 0.75em;
+            }
+            
+            .search-status-close {
+                width: 28px;
+                height: 28px;
+                font-size: 1.8em;
+            }
+        }
+
+        /* Search Suggestions Styles */
+
 
         .person-name {
             font-size: 1.1em;
@@ -1785,7 +1948,11 @@
                 { "id": "nkusi", "name": "Nkusi Heriman", "gender": "M" },
                 { "id": "mukabideri", "name": "Mukabideri Belancilla", "gender": "F" },
                 { "id": "mukandimbira", "name": "Mukandimbira Dancilla", "gender": "F" },
-                { "id": "unknown_father", "name": "Forefather", "gender": "M", "isMissing": true, "notes": "Father of Rudahunikira." }
+                { "id": "unknown_father", "name": "Forefather", "gender": "M", "isMissing": true, "notes": "Father of Rudahunikira." },
+                { "id": "alfred_hitayezu", "name": "Alfred Hitayezu", "gender": "M" },
+                { "id": "jean_de_dieu", "name": "Jean De Dieu", "gender": "M" },
+                { "id": "rama_smith", "name": "Rama Smith", "gender": "M" },
+                { "id": "urusaro_chelline_keilla", "name": "Urusaro Chelline Keilla", "gender": "F" }
             ],
             "relationships": [
                 { "type": "spouse", "fromId": "gahenda", "toId": "mitunga" },
@@ -1831,7 +1998,11 @@
                 { "type": "parent", "fromId": "rwabiza", "toId": "gakaka_bosco" },
                 { "type": "parent", "fromId": "rwabiza", "toId": "nkusi" },
                 { "type": "parent", "fromId": "rwabiza", "toId": "mukabideri" },
-                { "type": "parent", "fromId": "rwabiza", "toId": "mukandimbira" }
+                { "type": "parent", "fromId": "rwabiza", "toId": "mukandimbira" },
+                { "type": "parent", "fromId": "iyakaremye", "toId": "alfred_hitayezu" },
+                { "type": "parent", "fromId": "alfred_hitayezu", "toId": "jean_de_dieu" },
+                { "type": "parent", "fromId": "alfred_hitayezu", "toId": "rama_smith" },
+                { "type": "parent", "fromId": "alfred_hitayezu", "toId": "urusaro_chelline_keilla" }
             ]
         };
 
@@ -2024,6 +2195,9 @@
 
 
             updateStatistics();
+            
+            // Enhance accessibility for all person cards
+            enhancePersonCardAccessibility();
         }
 
         function createMissingPersonCard(personId) {
@@ -2081,34 +2255,34 @@
                 clearHighlights();
                 clearSearchHighlights();
                 
+                // Get complete family path data
+                const familyPathData = getCompleteFamilyPathData(personId);
+                const ancestralPath = familyPathData.ancestralPath;
+                const directRelationships = familyPathData.directRelationships;
+                const allRelatedPeople = familyPathData.allRelatedPeople;
+                
+                // Debug logging to verify ancestral path
+                console.log(`Highlighting relatives for: ${personId}`);
+                console.log('Ancestral path:', ancestralPath);
+                console.log('All related people:', allRelatedPeople);
+                
                 // Highlight the selected person
                 const selectedCard = document.querySelector(`[data-person-id="${personId}"]`);
-                
                 if (selectedCard) {
                     selectedCard.classList.add('highlighted');
                 }
 
-                // Find and highlight relatives
-                const relatives = new Set();
+                // Highlight all people in the ancestral path and direct relationships
+                const allPeopleToHighlight = new Set([...ancestralPath, ...allRelatedPeople]);
                 
-                familyData.relationships.forEach(rel => {
-                    if (rel.fromId === personId) {
-                        relatives.add(rel.toId);
-                    }
-                    if (rel.toId === personId) {
-                        relatives.add(rel.fromId);
-                    }
-                });
-
-                // Highlight relative cards
-                relatives.forEach(relativeId => {
-                    const card = document.querySelector(`[data-person-id="${relativeId}"]`);
-                    if (card) {
-                        card.classList.add('highlighted');
+                allPeopleToHighlight.forEach(personIdToHighlight => {
+                    if (personIdToHighlight !== personId) { // Don't highlight the selected person twice
+                        const card = document.querySelector(`[data-person-id="${personIdToHighlight}"]`);
+                        if (card) {
+                            card.classList.add('highlighted');
+                        }
                     }
                 });
-
-
 
                 // Store the current highlighted person for persistent highlighting
                 window.currentHighlightedPerson = personId;
@@ -2135,6 +2309,25 @@
             document.querySelectorAll('.person-card').forEach(card => {
                 card.classList.remove('search-highlighted');
             });
+            
+            // Also clear 3D search highlights if in 3D view
+            if (window.is3DView && window.familyNodes) {
+                window.familyNodes.forEach(node => {
+                    // Reset to original appearance
+                    node.material.color.copy(node.userData.originalColor);
+                    node.scale.copy(node.userData.originalScale);
+                    if (node.userData.label) {
+                        node.userData.label.material.opacity = 1;
+                    }
+                });
+                
+                // Clear relationship lines
+                if (window.scene) {
+                    window.scene.children = window.scene.children.filter(child => 
+                        child.type !== 'Line' && child.type !== 'LineSegments'
+                    );
+                }
+            }
         }
 
 
@@ -2159,59 +2352,421 @@
             }
         }
 
+        // Enhanced search status functions
+        function showEnhancedSearchStatus(personId, query) {
+            const person = familyData.people.find(p => p.id === personId);
+            if (!person) return;
+            
+            // Get complete ancestral path and relationships
+            const familyPathData = getCompleteFamilyPathData(personId);
+            const ancestralPath = familyPathData.ancestralPath;
+            const directRelationships = familyPathData.directRelationships;
+            
+            // Count relationship types
+            const children = directRelationships.filter(rel => rel.type === 'parent' && rel.fromId === personId).length;
+            const parents = directRelationships.filter(rel => rel.type === 'parent' && rel.toId === personId).length;
+            const spouses = directRelationships.filter(rel => rel.type === 'spouse' && (rel.fromId === personId || rel.toId === personId)).length;
+            
+            // Create or update search status element
+            let searchStatus = document.getElementById('searchStatus');
+            if (!searchStatus) {
+                searchStatus = document.createElement('div');
+                searchStatus.id = 'searchStatus';
+                searchStatus.className = 'search-status';
+                document.body.appendChild(searchStatus);
+            }
+            
+            // Build relationship summary
+            let relationshipText = '';
+            if (children > 0) relationshipText += `${children} child${children > 1 ? 'ren' : ''}`;
+            if (parents > 0) relationshipText += `${relationshipText ? ', ' : ''}${parents} parent${parents > 1 ? 's' : ''}`;
+            if (spouses > 0) relationshipText += `${relationshipText ? ', ' : ''}${spouses} spouse${spouses > 1 ? 's' : ''}`;
+            
+            // Add ancestral path info
+            if (ancestralPath.length > 1) {
+                relationshipText += `${relationshipText ? ' • ' : ''}${ancestralPath.length - 1} generation${ancestralPath.length > 2 ? 's' : ''} from root`;
+            }
+            
+            searchStatus.innerHTML = `
+                <div class="search-status-content">
+                    <div class="search-status-header">
+                        <div class="search-status-title">🔍 Found: ${person.name}</div>
+                        <button class="search-status-close" onclick="hideSearchStatus()">×</button>
+                    </div>
+                    <div class="search-status-relationships">${relationshipText || 'No direct relationships'}</div>
+                    <div class="search-status-query">Search: "${query}"</div>
+                </div>
+            `;
+            
+            searchStatus.style.display = 'flex';
+            setTimeout(() => {
+                searchStatus.classList.add('visible');
+            }, 10);
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                hideSearchStatus();
+            }, 3000);
+        }
+
+        function showMultipleMatchesStatus(count, query) {
+            let searchStatus = document.getElementById('searchStatus');
+            if (!searchStatus) {
+                searchStatus = document.createElement('div');
+                searchStatus.id = 'searchStatus';
+                searchStatus.className = 'search-status';
+                document.body.appendChild(searchStatus);
+            }
+            
+            searchStatus.innerHTML = `
+                <div class="search-status-content">
+                    <div class="search-status-header">
+                        <div class="search-status-title">🔍 Found ${count} matches</div>
+                        <button class="search-status-close" onclick="hideSearchStatus()">×</button>
+                    </div>
+                    <div class="search-status-relationships">Type more to narrow down results</div>
+                    <div class="search-status-query">Search: "${query}"</div>
+                </div>
+            `;
+            
+            searchStatus.style.display = 'flex';
+            setTimeout(() => {
+                searchStatus.classList.add('visible');
+            }, 10);
+            
+            // Auto-hide after 2.5 seconds (shorter for multiple matches)
+            setTimeout(() => {
+                hideSearchStatus();
+            }, 2500);
+        }
+
+        function showNoMatchesStatus(query) {
+            let searchStatus = document.getElementById('searchStatus');
+            if (!searchStatus) {
+                searchStatus = document.createElement('div');
+                searchStatus.id = 'searchStatus';
+                searchStatus.className = 'search-status';
+                document.body.appendChild(searchStatus);
+            }
+            
+            searchStatus.innerHTML = `
+                <div class="search-status-content">
+                    <div class="search-status-header">
+                        <div class="search-status-title">🔍 No matches found</div>
+                        <button class="search-status-close" onclick="hideSearchStatus()">×</button>
+                    </div>
+                    <div class="search-status-relationships">Try a different search term</div>
+                    <div class="search-status-query">Search: "${query}"</div>
+                </div>
+            `;
+            
+            searchStatus.style.display = 'flex';
+            setTimeout(() => {
+                searchStatus.classList.add('visible');
+            }, 10);
+            
+            // Auto-hide after 2 seconds (shortest for no matches)
+            setTimeout(() => {
+                hideSearchStatus();
+            }, 2000);
+        }
+
+        function hideSearchStatus() {
+            const searchStatus = document.getElementById('searchStatus');
+            if (searchStatus) {
+                searchStatus.classList.remove('visible');
+                setTimeout(() => {
+                    searchStatus.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        // Enhanced Accessibility Functions
+        function enhanceSearchAccessibility() {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.setAttribute('aria-label', 'Search family members');
+                searchInput.setAttribute('role', 'searchbox');
+                searchInput.setAttribute('autocomplete', 'off');
+            }
+        }
+
+        function enhancePersonCardAccessibility() {
+            document.querySelectorAll('.person-card').forEach(card => {
+                const personId = card.dataset.personId;
+                const person = familyData.people.find(p => p.id === personId);
+                
+                if (person) {
+                    // Set ARIA attributes
+                    card.setAttribute('role', 'button');
+                    card.setAttribute('tabindex', '0');
+                    card.setAttribute('aria-label', `${person.name}, ${person.gender === 'M' ? 'Male' : 'Female'}`);
+                    
+                    // Add relationship indicators
+                    const hasChildren = familyData.relationships.some(rel => 
+                        rel.type === 'parent' && rel.fromId === personId
+                    );
+                    const hasSpouse = familyData.relationships.some(rel => 
+                        rel.type === 'spouse' && (rel.fromId === personId || rel.toId === personId)
+                    );
+                    const hasParents = familyData.relationships.some(rel => 
+                        rel.type === 'parent' && rel.toId === personId
+                    );
+                    
+                    // Add visual indicator classes
+                    if (hasChildren) card.classList.add('has-children');
+                    if (hasSpouse) card.classList.add('has-spouse');
+                    if (hasParents) card.classList.add('has-parents');
+                    
+                    // Set generation data attribute
+                    const generation = getPersonGeneration(personId);
+                    if (generation !== null) {
+                        card.setAttribute('data-generation', generation);
+                    }
+                    
+                    // Add keyboard event listeners
+                    card.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            highlightCompleteFamilyPath(personId);
+                        }
+                    });
+                }
+            });
+        }
+
+        function getPersonGeneration(personId) {
+            for (const [genKey, people] of Object.entries(generationStructure)) {
+                if (people.includes(personId)) {
+                    return parseInt(genKey);
+                }
+            }
+            return null;
+        }
+
+        // Highlight complete family path from root ancestors to the specified person
+        function highlightCompleteFamilyPath(personId) {
+            // This function now just calls highlightRelatives for consistency
+            highlightRelatives(personId);
+        }
+
+        // Get complete family path from root ancestors to the specified person
+        function getCompleteFamilyPathData(personId) {
+            const ancestralPath = [];
+            const directRelationships = [];
+            const allRelatedPeople = new Set();
+            
+            // Check if this person is a root ancestor (Gahenda or Mitunga)
+            const isRootAncestor = personId === 'gahenda' || personId === 'mitunga';
+            
+            if (isRootAncestor) {
+                // For root ancestors, just get their direct relationships
+                ancestralPath.push(personId);
+                const relationships = familyData.relationships.filter(rel => 
+                    rel.fromId === personId || rel.toId === personId
+                );
+                
+                relationships.forEach(rel => {
+                    directRelationships.push(rel);
+                    if (rel.fromId === personId) {
+                        allRelatedPeople.add(rel.toId);
+                    } else {
+                        allRelatedPeople.add(rel.fromId);
+                    }
+                });
+            } else {
+                // For everyone else, trace the complete ancestral path to root ancestors
+                // Start with the searched person
+                ancestralPath.push(personId);
+                
+                // Trace UP to ancestors (parents, grandparents, etc.) until we reach root ancestors
+                let currentPersonId = personId;
+                while (true) {
+                    const parentRel = familyData.relationships.find(rel => 
+                        rel.type === 'parent' && rel.toId === currentPersonId
+                    );
+                    
+                    if (!parentRel) break; // No more parents
+                    
+                    const parentId = parentRel.fromId;
+                    ancestralPath.unshift(parentId); // Add to beginning (oldest first)
+                    currentPersonId = parentId;
+                    
+                    // Continue until we reach root ancestors (Gahenda or Mitunga)
+                    if (parentId === 'gahenda' || parentId === 'mitunga') {
+                        // Also add the spouse of the root ancestor if they exist
+                        const spouseRel = familyData.relationships.find(rel => 
+                            rel.type === 'spouse' && (rel.fromId === parentId || rel.toId === parentId)
+                        );
+                        if (spouseRel) {
+                            const spouseId = spouseRel.fromId === parentId ? spouseRel.toId : spouseRel.fromId;
+                            if (!ancestralPath.includes(spouseId)) {
+                                ancestralPath.unshift(spouseId);
+                            }
+                        }
+                        break;
+                    }
+                }
+                
+                // Get direct relationships for the searched person (children, spouses, siblings)
+                const directRels = familyData.relationships.filter(rel => 
+                    (rel.fromId === personId || rel.toId === personId)
+                );
+                
+                directRels.forEach(rel => {
+                    directRelationships.push(rel);
+                    
+                    // Add the other person in the relationship
+                    if (rel.fromId === personId) {
+                        allRelatedPeople.add(rel.toId);
+                    } else {
+                        allRelatedPeople.add(rel.fromId);
+                    }
+                });
+                
+                // Add all people in the ancestral path to related people
+                ancestralPath.forEach(ancestorId => {
+                    allRelatedPeople.add(ancestorId);
+                });
+            }
+            
+            return {
+                ancestralPath: ancestralPath,
+                directRelationships: directRelationships,
+                allRelatedPeople: Array.from(allRelatedPeople)
+            };
+        }
+
         function setupSearch() {
             const searchInput = document.getElementById('searchInput');
             
             // Ensure search input is empty on initialization
             searchInput.value = '';
             
+            // Enhance accessibility
+            enhanceSearchAccessibility();
+            
             searchInput.addEventListener('input', (e) => {
                 const query = e.target.value.toLowerCase().trim();
                 
-                // If there's a search query, highlight matching names
+                // If there's a search query, highlight matching names and show relationships
                 if (query && query.length > 0) {
-                    // Clear previous search highlights but keep relationship highlights
+                    // Clear previous highlights
+                    clearHighlights();
                     clearSearchHighlights();
                     
-                    // Add search highlighting
+                    // Find matching people
+                    const matchingPeople = [];
                     document.querySelectorAll('.person-card').forEach(card => {
                         const name = card.querySelector('.person-name').textContent.toLowerCase();
                         if (name.includes(query)) {
                             card.classList.add('search-highlighted');
+                            matchingPeople.push(card.dataset.personId);
                         }
                     });
+                    
+                    // If exactly one person matches, automatically highlight them and their complete family path
+                    if (matchingPeople.length === 1) {
+                        const personId = matchingPeople[0];
+                        highlightRelatives(personId);
+                        
+                        // Also highlight in 3D view if available
+                        if (window.is3DView && window.familyNodes) {
+                            const personNode = window.familyNodes.find(n => n.userData.person.id === personId);
+                            if (personNode) {
+                                highlight3DPerson(personNode);
+                                show3DRelationships(personId);
+                                focusOnPerson(personNode);
+                            }
+                        }
+                        
+                        // Show enhanced status with relationship count
+                        showEnhancedSearchStatus(personId, query);
+                    } else if (matchingPeople.length > 1) {
+                        // Multiple matches - show count and highlight all
+                        showMultipleMatchesStatus(matchingPeople.length, query);
+                    } else {
+                        // No matches
+                        showNoMatchesStatus(query);
+                    }
                 } else {
                     // If no search query, restore relationship highlighting if exists
                     if (window.currentHighlightedPerson) {
                         clearSearchHighlights(); // Clear search highlights first
-                        // Don't call highlightRelatives here to avoid conflicts
-                        // Just restore the existing highlighting
+                        
+                        // Restore the complete family path highlighting
+                        const familyPathData = getCompleteFamilyPathData(window.currentHighlightedPerson);
+                        const ancestralPath = familyPathData.ancestralPath;
+                        const allRelatedPeople = familyPathData.allRelatedPeople;
+                        
+                        // Highlight the selected person
                         const selectedCard = document.querySelector(`[data-person-id="${window.currentHighlightedPerson}"]`);
                         if (selectedCard) {
                             selectedCard.classList.add('highlighted');
                         }
                         
-                        // Restore relative highlighting
-                        const relatives = new Set();
-                        familyData.relationships.forEach(rel => {
-                            if (rel.fromId === window.currentHighlightedPerson) {
-                                relatives.add(rel.toId);
-                            }
-                            if (rel.toId === window.currentHighlightedPerson) {
-                                relatives.add(rel.fromId);
+                        // Highlight all people in the ancestral path and direct relationships
+                        const allPeopleToHighlight = new Set([...ancestralPath, ...allRelatedPeople]);
+                        
+                        allPeopleToHighlight.forEach(personIdToHighlight => {
+                            if (personIdToHighlight !== window.currentHighlightedPerson) { // Don't highlight the selected person twice
+                                const card = document.querySelector(`[data-person-id="${personIdToHighlight}"]`);
+                                if (card) {
+                                    card.classList.add('highlighted');
+                                }
                             }
                         });
                         
-                        relatives.forEach(relativeId => {
-                            const card = document.querySelector(`[data-person-id="${relativeId}"]`);
-                            if (card) {
-                                card.classList.add('highlighted');
+                        // Also restore 3D highlighting if in 3D view
+                        if (window.is3DView && window.familyNodes) {
+                            const personNode = window.familyNodes.find(n => n.userData.person.id === window.currentHighlightedPerson);
+                            if (personNode) {
+                                window.highlight3DPerson(personNode);
+                                window.show3DRelationships(window.currentHighlightedPerson);
                             }
-                        });
+                        }
                     } else {
                         // Clear all highlights if no relationship is active
                         clearHighlights();
                         clearSearchHighlights();
+                    }
+                    
+                    // Hide search status
+                    hideSearchStatus();
+                }
+            });
+
+            // Add Enter key support for search
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const query = searchInput.value.toLowerCase().trim();
+                    if (query && query.length > 0) {
+                        // Find first match and highlight
+                        const matchingCards = document.querySelectorAll('.person-card.search-highlighted');
+                        if (matchingCards.length > 0) {
+                            const firstMatch = matchingCards[0];
+                            const personId = firstMatch.dataset.personId;
+                            
+                            // Clear search highlights but keep the family path highlighting
+                            clearSearchHighlights();
+                            
+                            // Highlight the complete family path
+                            highlightRelatives(personId);
+                            
+                            // Also highlight in 3D view if available
+                            if (window.is3DView && window.familyNodes) {
+                                const personNode = window.familyNodes.find(n => n.userData.person.id === personId);
+                                if (personNode) {
+                                    highlight3DPerson(personNode);
+                                    show3DRelationships(personId);
+                                    focusOnPerson(personNode);
+                                }
+                            }
+                            
+                            // Show the enhanced status
+                            showEnhancedSearchStatus(personId, query);
+                        }
                     }
                 }
             });
@@ -2241,6 +2796,10 @@
                     navigateToCard(currentIndex - 1, allCards);
                     break;
                 case 'Enter':
+                    // Don't handle Enter if we're in a search input
+                    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+                        return;
+                    }
                     e.preventDefault();
                     if (highlightedCards.length > 0) {
                         const personId = highlightedCards[0].dataset.personId;
@@ -2380,9 +2939,6 @@
             }
         }
 
-
-
-
         // 3D Family Tree View
         let is3DView = false;
         let scene, camera, renderer, controls;
@@ -2398,6 +2954,7 @@
 
         function enter3DView() {
             is3DView = true;
+            window.is3DView = true; // Update global flag for search integration
             document.body.classList.add('three-d-mode');
             
             // Hide 2D tree and other elements
@@ -2420,6 +2977,7 @@
 
         function exit3DView() {
             is3DView = false;
+            window.is3DView = false; // Update global flag for search integration
             document.body.classList.remove('three-d-mode');
             
             // Show 2D tree and other elements
@@ -2457,24 +3015,24 @@
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.set(0, 8, 15);
 
-            // Create renderer with mobile-first optimization
+            // Create renderer with 4K quality optimization
             const isMobile = window.innerWidth <= 768;
             renderer = new THREE.WebGLRenderer({ 
-                antialias: !isMobile, // Disable antialiasing on mobile for performance
+                antialias: true, // Enable antialiasing for 4K quality
                 alpha: true,
-                powerPreference: isMobile ? "default" : "high-performance",
+                powerPreference: "high-performance", // Force high performance
                 preserveDrawingBuffer: false,
                 stencil: false,
                 depth: true
             });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.shadowMap.enabled = !isMobile; // Disable shadows on mobile for performance
+            renderer.shadowMap.enabled = true; // Enable shadows for quality
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            renderer.shadowMap.autoUpdate = !isMobile;
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1 : 2)); // Cap at 1x on mobile
+            renderer.shadowMap.autoUpdate = true;
+            renderer.setPixelRatio(Math.max(window.devicePixelRatio, 2)); // Force high DPI for 4K quality
             renderer.outputEncoding = THREE.sRGBEncoding;
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 1.4; // Slightly brighter
+            renderer.toneMappingExposure = 1.4;
             document.body.appendChild(renderer.domElement);
 
             // Modern lighting system
@@ -2521,13 +3079,17 @@
                 controls.rotateSpeed = 0.8; // Responsive but controlled
                 controls.zoomSpeed = 0.8;
                 controls.enableKeys = false;
+                // Ensure touch events work properly
+                controls.enableDamping = true;
+                controls.dampingFactor = 0.1;
             } else {
                 controls.rotateSpeed = 1.0; // Smooth desktop experience
                 controls.zoomSpeed = 1.0;
             }
 
-            // Add click event listener
+            // Add click event listener for both mouse and touch
             renderer.domElement.addEventListener('click', on3DClick);
+            renderer.domElement.addEventListener('touchend', on3DClick); // Also handle touch
 
             // Setup hover effects (only on desktop)
             if (!isMobile) {
@@ -2635,6 +3197,9 @@
 
             // Add connecting lines between generations
             addGenerationConnections();
+            
+            // Update global reference for search integration
+            window.familyNodes = familyNodes;
         }
 
         function addGenerationConnections() {
@@ -2680,8 +3245,8 @@
         function createPersonNode(person, x, y, z, generation) {
             const isMobile = window.innerWidth <= 768;
             
-            // Create modern geometry with better detail
-            const geometry = new THREE.SphereGeometry(isMobile ? 0.4 : 0.5, isMobile ? 20 : 32, isMobile ? 20 : 32);
+            // Create ultra-high quality geometry for 4K resolution
+            const geometry = new THREE.SphereGeometry(isMobile ? 0.4 : 0.5, isMobile ? 64 : 128, isMobile ? 64 : 128);
             
             // Use existing color scheme from 2D view
             let baseColor;
@@ -2727,14 +3292,14 @@
             scene.add(mesh);
             familyNodes.push(mesh);
 
-            // Create high-quality text label with mobile optimization
+            // Create ultra-high quality text label for 4K resolution
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
             
-            // Use appropriate canvas size for mobile
-            const devicePixelRatio = window.devicePixelRatio || 1;
-            const canvasWidth = isMobile ? 512 : 1024;
-            const canvasHeight = isMobile ? 128 : 256;
+            // Force high resolution for 4K quality
+            const devicePixelRatio = Math.max(window.devicePixelRatio || 1, 2);
+            const canvasWidth = isMobile ? 1024 : 2048; // Doubled for 4K
+            const canvasHeight = isMobile ? 256 : 512;   // Doubled for 4K
             
             canvas.width = canvasWidth * devicePixelRatio;
             canvas.height = canvasHeight * devicePixelRatio;
@@ -2746,43 +3311,44 @@
             canvas.style.width = canvasWidth + 'px';
             canvas.style.height = canvasHeight + 'px';
             
-            // Enable text rendering optimizations
+            // Enable maximum text rendering quality
             context.textRenderingOptimization = 'optimizeQuality';
             context.imageSmoothingEnabled = true;
             context.imageSmoothingQuality = 'high';
             
-            // Create gradient background for better readability
+            // Create ultra-high quality gradient background for 4K
             const gradient = context.createLinearGradient(0, 0, 0, canvasHeight);
-            gradient.addColorStop(0, 'rgba(0, 0, 0, 0.9)');
-            gradient.addColorStop(0.5, 'rgba(0, 0, 0, 0.8)');
-            gradient.addColorStop(1, 'rgba(0, 0, 0, 0.9)');
+            gradient.addColorStop(0, 'rgba(0, 0, 0, 0.95)');
+            gradient.addColorStop(0.3, 'rgba(0, 0, 0, 0.9)');
+            gradient.addColorStop(0.7, 'rgba(0, 0, 0, 0.9)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0.95)');
             context.fillStyle = gradient;
             context.fillRect(0, 0, canvasWidth, canvasHeight);
             
-            // Add subtle border with glow effect
+            // Add high-quality border with enhanced glow effect
             context.shadowColor = person.gender === 'M' ? '#4299e1' : '#ed64a6';
-            context.shadowBlur = isMobile ? 8 : 15;
+            context.shadowBlur = isMobile ? 16 : 32; // Increased for 4K
             context.shadowOffsetX = 0;
             context.shadowOffsetY = 0;
             context.strokeStyle = person.gender === 'M' ? '#4299e1' : '#ed64a6';
-            context.lineWidth = isMobile ? 2 : 4;
-            context.strokeRect(2, 2, canvasWidth - 4, canvasHeight - 4);
+            context.lineWidth = isMobile ? 4 : 8; // Thicker for 4K
+            context.strokeRect(4, 4, canvasWidth - 8, canvasHeight - 8);
             
             // Reset shadow for text
             context.shadowColor = 'transparent';
             context.shadowBlur = 0;
             
-            // Use high-quality font with better rendering
-            const fontSize = isMobile ? 20 : 32;
+            // Use ultra-high quality font rendering for 4K
+            const fontSize = isMobile ? 32 : 48; // Increased for 4K quality
             context.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif`;
             context.textAlign = 'center';
             context.textBaseline = 'middle';
             
-            // Add text shadow for better readability
-            context.shadowColor = 'rgba(0, 0, 0, 0.8)';
-            context.shadowBlur = isMobile ? 2 : 3;
-            context.shadowOffsetX = 1;
-            context.shadowOffsetY = 1;
+            // Add enhanced text shadow for 4K readability
+            context.shadowColor = 'rgba(0, 0, 0, 0.9)';
+            context.shadowBlur = isMobile ? 4 : 6; // Increased for 4K
+            context.shadowOffsetX = 2;
+            context.shadowOffsetY = 2;
             
             // Split long names and render with optimal positioning
             const nameParts = person.name.split(' ');
@@ -2913,10 +3479,25 @@
         function on3DClick(event) {
             if (!is3DView) return;
 
-            // Calculate mouse position in normalized device coordinates
+            // Handle both mouse and touch events
+            let clientX, clientY;
+            
+            if (event.type === 'touchend' && event.changedTouches && event.changedTouches.length > 0) {
+                // Touch event
+                clientX = event.changedTouches[0].clientX;
+                clientY = event.changedTouches[0].clientY;
+            } else if (event.clientX !== undefined) {
+                // Mouse event
+                clientX = event.clientX;
+                clientY = event.clientY;
+            } else {
+                return;
+            }
+
+            // Calculate position in normalized device coordinates
             const mouse = new THREE.Vector2();
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            mouse.x = (clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(clientY / window.innerHeight) * 2 + 1;
 
             // Raycasting
             const raycaster = new THREE.Raycaster();
@@ -2937,6 +3518,46 @@
                 
                 // Animate camera to focus on the person
                 focusOnPerson(clickedNode);
+            } else {
+            }
+        }
+
+        // Mobile-specific touch handler for better responsiveness
+        function on3DTouch(event) {
+            if (!is3DView) return;
+            
+            // Prevent default to avoid conflicts
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Get touch position
+            const touch = event.changedTouches[0];
+            const mouse = new THREE.Vector2();
+            mouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
+
+            // Raycasting
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(mouse, camera);
+
+            // Check for intersections with family nodes
+            const intersects = raycaster.intersectObjects(familyNodes);
+            
+            if (intersects.length > 0) {
+                const clickedNode = intersects[0].object;
+                const person = clickedNode.userData.person;
+                
+
+                
+                // Highlight the clicked person
+                highlight3DPerson(clickedNode);
+                
+                // Show relationships
+                show3DRelationships(person.id);
+                
+                // Animate camera to focus on the person
+                focusOnPerson(clickedNode);
+            } else {
             }
         }
 
@@ -2957,6 +3578,14 @@
                 node.userData.label.material.opacity = 1.5;
             }
         }
+
+        // Expose 3D functions globally for search integration
+        window.highlight3DPerson = highlight3DPerson;
+        window.show3DRelationships = show3DRelationships;
+        window.focusOnPerson = focusOnPerson;
+        window.familyNodes = familyNodes;
+        window.scene = scene;
+        window.is3DView = false; // Will be updated when 3D view is initialized
 
         function show3DRelationships(personId) {
             // Clear previous relationship lines
@@ -3075,12 +3704,14 @@
             let touchStartTime = 0;
             let isDoubleTap = false;
             let lastTapTime = 0;
+            let touchMoved = false;
 
             renderer.domElement.addEventListener('touchstart', (event) => {
                 if (event.touches.length === 1) {
                     touchStartX = event.touches[0].clientX;
                     touchStartY = event.touches[0].clientY;
                     touchStartTime = Date.now();
+                    touchMoved = false;
                     
                     // Check for double tap
                     const currentTime = Date.now();
@@ -3093,7 +3724,21 @@
                     }
                     lastTapTime = currentTime;
                 }
-            }, { passive: true });
+            }, { passive: false });
+
+            renderer.domElement.addEventListener('touchmove', (event) => {
+                if (event.touches.length === 1) {
+                    const touchX = event.touches[0].clientX;
+                    const touchY = event.touches[0].clientY;
+                    const deltaX = Math.abs(touchX - touchStartX);
+                    const deltaY = Math.abs(touchY - touchStartY);
+                    
+                    // Mark as moved if significant movement detected
+                    if (deltaX > 10 || deltaY > 10) {
+                        touchMoved = true;
+                    }
+                }
+            }, { passive: false });
 
             renderer.domElement.addEventListener('touchend', (event) => {
                 if (event.touches.length === 0 && !isDoubleTap) {
@@ -3105,8 +3750,8 @@
                     const deltaY = touchEndY - touchStartY;
                     const deltaTime = touchEndTime - touchStartTime;
                     
-                    // Modern swipe detection
-                    if (deltaTime < 400 && Math.abs(deltaX) > 40) {
+                    // Only handle swipe if touch moved significantly
+                    if (touchMoved && deltaTime < 400 && Math.abs(deltaX) > 40) {
                         if (deltaX > 0) {
                             // Swipe right - rotate right
                             rotateCamera('right');
@@ -3116,7 +3761,7 @@
                         }
                     }
                 }
-            }, { passive: true });
+            }, { passive: false });
         }
 
         // Modern camera control functions
